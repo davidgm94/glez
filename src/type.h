@@ -4,7 +4,7 @@
 
 #if NDEBUG
 #define GAME_RELEASE
-#define LOGS 0
+#define LOGS 1
 #else
 #define GAME_DEBUG
 #define LOGS 1

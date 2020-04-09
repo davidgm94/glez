@@ -6,6 +6,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <xmmintrin.h>
+#include <assert.h>
 
 typedef struct vec4 {
     union {
@@ -32,18 +33,28 @@ static inline float generate_random_color(void)
 
 #include "ext/stb_sprintf.h"
 #include "sys.h"
+#include "file.h"
 
+typedef int s_opengl_handle;
+typedef unsigned u_opengl_handle;
 int main(int argc, char* argv[])
 {
     int glfw_init = glfwInit();
-    if (glfw_init == GLFW_TRUE) {
-    } else {
-        _exit(GLFW_INIT_FAILED);
+    if (!glfw_init == GLFW_TRUE) {
+        const char glfw_init_failed[] = "GLFW initialization failed! Exiting...\n";
+        LOG_ERROR_AND_EXIT(glfw_init_failed);
     }
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     GLFWwindow* window = glfwCreateWindow(1024, 576, "FirstGame", NULL, NULL);
+    if (!window) {
+        const char window_err_msg[] = "GLFW window couldn't be created\n";
+        LOG_ERROR_AND_EXIT(window_err_msg);
+    }
+
     glfwMakeContextCurrent(window);
     glfwSetErrorCallback(glfw_error_callback);
     int glad_init = gladLoadGL();
@@ -51,6 +62,14 @@ int main(int argc, char* argv[])
         const char glad_err_msg[] = "GLAD initialization failed. Exiting...\n";
         LOG_ERROR_AND_EXIT(glad_err_msg);
     }
+
+    char* vertex_shader_source = load_file("src/shaders/triangle.glsl");
+    s_opengl_handle vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
+    glCompileShader(vertex_shader);
+    
+
+    printf("%s\n", file);
 
     while (!glfwWindowShouldClose(window))
     {

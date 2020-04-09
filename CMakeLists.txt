@@ -11,7 +11,7 @@ set(PLATFORM Desktop)
 set(SRC_DIR src)
 set(EXT_SRC_DIR ${SRC_DIR}/ext)
 file(GLOB_RECURSE SOURCE_FILES RELATIVE ${CMAKE_SOURCE_DIR} "${SRC_DIR}/*.c")
-add_executable(FirstGame ${SOURCE_FILES} src/type.h src/log.h src/log.c src/sys.h)
+add_executable(FirstGame ${SOURCE_FILES} src/type.h src/log.h src/log.c src/sys.h src/file.c src/file.h)
 #dependencies
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)

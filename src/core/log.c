@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <assert.h>
 #define STB_SPRINTF_IMPLEMENTATION
-#include "ext/stb_sprintf.h"
+#include "../ext/stb_sprintf.h"
 
 frametime_record past_frame;
 frametime_record current_frame;

@@ -26,7 +26,7 @@ static const char* TIME_BLOCK_STRING[] =
 typedef struct timing_record {
     struct timespec start;
     struct timespec end;
-    float ms;
+    f32 ms;
 } timing_record;
 
 typedef struct frametime_record {

@@ -54,7 +54,7 @@ extern void frame_logger(char* fmt, ...)
     va_start(args, fmt);
     int bytes_written = stbsp_vsprintf(_g_print_string_buffer_ptr, fmt, args);
     va_end(args);
-    assert(_g_print_string_buffer_ptr + bytes_written < PRINT_STRING_BUFFER_CHAR_COUNT);
+    assert(_g_print_string_buffer_ptr + bytes_written < _g_print_string_buffer + PRINT_STRING_BUFFER_CHAR_COUNT);
     _g_print_string_buffer_ptr += (u64)bytes_written;
 #endif
 }
@@ -78,15 +78,4 @@ extern void frame_log_and_clear(void)
     fwrite(_g_print_string_buffer, _g_print_string_buffer_ptr - _g_print_string_buffer, 1, stdout);
     // Reset the buffer
     _g_print_string_buffer_ptr = _g_print_string_buffer;
-}
-
-#include <GLFW/glfw3.h>
-void frame_set_window_title(GLFWwindow *window) {
-#if LOGS == 0
-    char buffer[128];
-    stbsp_sprintf(buffer, "FirstGame [DEBUG_INFO] CPU: %.02f%%. GPU: %.02f%%\n",
-                  (current_frame.record[TIME_FRAME_CPU].ms / current_frame.record[TIME_FRAME_TOTAL].ms) * 100.0f,
-                  (current_frame.record[TIME_FRAME_GPU].ms / current_frame.record[TIME_FRAME_TOTAL].ms) * 100.0f);
-    glfwSetWindowTitle(window, buffer);
-#endif
 }

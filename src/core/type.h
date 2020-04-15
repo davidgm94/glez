@@ -2,7 +2,7 @@
 
 /*** GAME CONTROLS ***/
 
-#define LOGS 0
+#define LOGS 1
 #if NDEBUG
 #define GAME_RELEASE
 #else

@@ -35,8 +35,6 @@ typedef struct frametime_record {
 
 extern void frame_logger(char* fmt, ...);
 extern void frame_log_and_clear(void);
-struct GLFWwindow;
-extern void frame_set_window_title(struct GLFWwindow* window);
 
 extern frametime_record current_frame;
 

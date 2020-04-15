@@ -307,6 +307,10 @@ int main(int argc, char* argv[])
 //    game_camera.pos[0] = 0.0f;
 //    game_camera.pos[1] = 0.0f;
 //    game_camera.pos[2] = 3.0f;
+//    game_camera.front[0] = 0.0f;
+//    game_camera.front[1] = 0.0f;
+//    game_camera.front[2] = -1.0f;
+
     game_camera.pos[0] = 0.0f;
     game_camera.pos[1] = 20.0f;
     game_camera.pos[2] = 20.0f;
@@ -476,11 +480,11 @@ int main(int argc, char* argv[])
             },
     };
 
-    u_opengl_handle vbo, vao;
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    u_opengl_handle box_vbo, box_vao;
+    glGenVertexArrays(1, &box_vao);
+    glGenBuffers(1, &box_vbo);
+    glBindVertexArray(box_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, box_vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     uniform_metadata metadata[2] = {
@@ -505,7 +509,7 @@ int main(int argc, char* argv[])
     glGenVertexArrays(1, &floor_vao);
     glGenBuffers(1, &floor_vbo);
     glBindVertexArray(floor_vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, floor_vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(floor_vertices), floor_vertices, GL_STATIC_DRAW);
 
     fill_vertex_attributes(metadata, COUNT_OF(metadata), sizeof(pos_tex_vertex));
@@ -549,7 +553,7 @@ int main(int argc, char* argv[])
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
-        glBindVertexArray(vao);
+        glBindVertexArray(box_vao);
         shader_set_mat4(shader_program, "proj", proj);
         shader_set_mat4(shader_program, "view", view);
 

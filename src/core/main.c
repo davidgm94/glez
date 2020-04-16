@@ -12,53 +12,7 @@
 #include <stb_image.h>
 #include "sys.h"
 #include "file.h"
-
-typedef int s_opengl_handle;
-typedef unsigned u_opengl_handle;
-
-s_opengl_handle compile_shader(const char* filename, GLenum shader_type)
-{
-    char shader_relative_path[256] = "src/shaders/";
-    strcat(shader_relative_path, filename);
-    char* shader_content = load_file(shader_relative_path);
-    s_opengl_handle shader = glCreateShader(shader_type);
-    glShaderSource(shader, 1, (const char *const *)&shader_content, NULL);
-    glCompileShader(shader);
-    s32 success;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (success) {
-        printf("Shader %s compiled successfully.\n", filename);
-    } else {
-        char info_log[512];
-        glGetShaderInfoLog(shader, COUNT_OF(info_log), NULL, info_log);
-        printf("Shader %s failed to compile:\n%s\n", filename, info_log);
-        _exit(success);
-    }
-    return shader;
-}
-
-s_opengl_handle create_program(s_opengl_handle vertex_shader, s_opengl_handle fragment_shader)
-{
-    s_opengl_handle shader_program = glCreateProgram();
-    glAttachShader(shader_program, vertex_shader);
-    glAttachShader(shader_program, fragment_shader);
-    glLinkProgram(shader_program);
-
-    s32 success;
-    glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
-    if (success) {
-        printf("Shader program linked successfully.\n");
-    } else {
-        char info_log[512];
-        glGetProgramInfoLog(shader_program, COUNT_OF(info_log), NULL, info_log);
-        printf("Shader program failed to be linked:\n%s\n", info_log);
-        _exit(success);
-    }
-
-    return shader_program;
-}
+#include "gl.h"
 
 typedef struct {
     u32 width, height;
@@ -79,27 +33,6 @@ typedef struct {
     f32 tex_coord[2];
 } pos_tex_vertex;
 
-typedef struct{
-    GLenum type;
-    u8 count;
-    u8 size;
-    u8 offset;
-    u8 padding[1];
-} uniform_metadata;
-
-void fill_vertex_attributes(uniform_metadata* element_metadata_arr, u32 element_count, size_t type_size)
-{
-    u8 offset = 0;
-    for (int i = 0; i < element_count; i++)
-    {
-        uniform_metadata metadata_i = element_metadata_arr[i];
-        //printf("arg0: %d, arg1: %d, type..., arg_penul: %d, arg_last: %d\n", i, metadata_i.count, metadata_i.count * metadata_i.size, )
-        glVertexAttribPointer(i, metadata_i.count, metadata_i.type, GL_FALSE, type_size, (void*)(u64)offset);
-        glEnableVertexAttribArray(i);
-        offset += metadata_i.count * metadata_i.size;
-    }
-}
-
 window_dimension w_dimension = {
         .width = 1024,
         .height = 576,
@@ -117,30 +50,6 @@ void glfw_error_callback(s32 error, const char* desc)
     frame_logger("[GLFW ERROR %d] %s\n", error, desc);
 }
 
-void shader_set_bool(s_opengl_handle shader_program, const char* name, bool value)
-{
-    glUniform1i(glGetUniformLocation(shader_program, name), (s32)value);
-}
-
-void shader_set_int(s_opengl_handle shader_program, const char* name, s32 value)
-{
-    glUniform1i(glGetUniformLocation(shader_program, name), value);
-}
-
-void shader_set_float(s_opengl_handle shader_program, const char* name, f32 value)
-{
-    glUniform1f(glGetUniformLocation(shader_program, name), value);
-}
-
-//void shader_set_mat4f(s_opengl_handle shader_program, const char* name, mat4f m)
-//{
-//    glUniformMatrix4fv(glGetUniformLocation(shader_program, name), 1, GL_FALSE, (const GLfloat*) &m);
-//}
-void shader_set_mat4(s_opengl_handle shader_program, const char* name, mat4 m)
-{
-    glUniformMatrix4fv(glGetUniformLocation(shader_program, name), 1, GL_FALSE, (const GLfloat*) m);
-}
-
 u_opengl_handle load_texture(const char* filename, bool transparency)
 {
     GLenum format = transparency ? GL_RGBA : GL_RGB;
@@ -154,7 +63,7 @@ u_opengl_handle load_texture(const char* filename, bool transparency)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    int width, height, channel_count;
+    s32 width, height, channel_count;
     stbi_set_flip_vertically_on_load(true);
     u8* data = stbi_load(filename, &width, &height, &channel_count, 0);
     assert(data);
@@ -198,9 +107,8 @@ void process_input(GLFWwindow *window)
         glfwSetWindowShouldClose(window, true);
 
     float camera_speed = 2.5f * delta_time;
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         glm_vec3_muladds(game_camera.front, camera_speed, game_camera.pos);
-    }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         glm_vec3_muladds(game_camera.front, -camera_speed, game_camera.pos);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
@@ -215,32 +123,25 @@ void process_input(GLFWwindow *window)
         glm_vec3_normalize(cross);
         glm_vec3_muladds(cross, camera_speed, game_camera.pos);
     }
-    float scale = 0.05f;
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        player_y += scale;
-    }
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        player_y -= scale;
-    }
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        player_x -= scale;
-    }
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        player_x += scale;
-    }
 
-    if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS) {
+    float scale = 0.05f;
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        player_y += scale;
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        player_y -= scale;
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        player_x -= scale;
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        player_x += scale;
+
+    if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS)
         floor_y += scale;
-    }
-    if (glfwGetKey(window, GLFW_KEY_KP_2) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_KP_2) == GLFW_PRESS)
         floor_y -= scale;
-    }
-    if (glfwGetKey(window, GLFW_KEY_KP_4) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_KP_4) == GLFW_PRESS)
         floor_x -= scale;
-    }
-    if (glfwGetKey(window, GLFW_KEY_KP_6) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_KP_6) == GLFW_PRESS)
         floor_x += scale;
-    }
 }
 
 // Not used
@@ -338,6 +239,7 @@ int main(int argc, char* argv[])
         LOG_ERROR_AND_EXIT(glfw_init_failed);
     }
 
+    //glfwWindowHint( GLFW_DOUBLEBUFFER, GL_FALSE );
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -431,52 +333,28 @@ int main(int argc, char* argv[])
 
     pos_tex_vertex floor_vertices[6] = {
             [0] = {
-                    .position = {
-                            1.0f, 0.0f, 1.0f,
-                    },
-                    .tex_coord = {
-                            1.0f, 1.0f,
-                    },
+                    .position = { 1.0f, 0.0f, 1.0f, },
+                    .tex_coord = { 1.0f, 1.0f, },
             },
             [1] = {
-                    .position = {
-                            -1.0f, 0.0f, 1.0f,
-                    },
-                    .tex_coord = {
-                            0.0f, 1.0f,
-                    },
+                    .position = { -1.0f, 0.0f, 1.0f, },
+                    .tex_coord = { 0.0f, 1.0f, },
             },
             [2] = {
-                    .position = {
-                            1.0f, 0.0f, -1.0f,
-                    },
-                    .tex_coord = {
-                            1.0f, 0.0f,
-                    },
+                    .position = { 1.0f, 0.0f, -1.0f, },
+                    .tex_coord = { 1.0f, 0.0f, },
             },
             [3] = {
-                    .position = {
-                            -1.0f, 0.0f, -1.0f,
-                    },
-                    .tex_coord = {
-                            0.0f, 0.0f,
-                    },
+                    .position = { -1.0f, 0.0f, -1.0f, },
+                    .tex_coord = { 0.0f, 0.0f, },
             },
             [4] = {
-                    .position = {
-                            -1.0f, 0.0f, 1.0f,
-                    },
-                    .tex_coord = {
-                            0.0f, 1.0f,
-                    },
+                    .position = { -1.0f, 0.0f, 1.0f, },
+                    .tex_coord = { 0.0f, 1.0f, },
             },
             [5] = {
-                    .position = {
-                            1.0f, 0.0f, -1.0f,
-                    },
-                    .tex_coord = {
-                            1.0f, 0.0f,
-                    },
+                    .position = { 1.0f, 0.0f, -1.0f, },
+                    .tex_coord = { 1.0f, 0.0f, },
             },
     };
 
@@ -586,6 +464,7 @@ int main(int argc, char* argv[])
         shader_set_mat4(floor_shader, "model", floor_model);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
+        // glFlush();
         glfwSwapBuffers(window);
         /// END GPU
 

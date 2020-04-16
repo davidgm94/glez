@@ -16,7 +16,7 @@ set(MESH_OPTIMIZER_DIRS ${EXT_SRC_DIR}/meshoptimizer-0.13/src ${EXT_SRC_DIR}/mes
 include_directories(${GLFW_INCLUDE_DIRS} ${EXT_SRC_DIR} ${MESH_OPTIMIZER_DIRS})
 file(GLOB_RECURSE SOURCE_FILES RELATIVE ${CMAKE_SOURCE_DIR} "${SRC_DIR}/core/*.c")
 file(GLOB_RECURSE HEADER_FILES RELATIVE ${CMAKE_SOURCE_DIR} "${SRC_DIR}/core/*.h")
-add_executable(FirstGame ${SOURCE_FILES} ${HEADER_FILES} src/core/sse2.h src/core/sse3.h src/core/ssse3.h src/core/sse41.h)
+add_executable(FirstGame ${SOURCE_FILES} ${HEADER_FILES} src/core/sse2.h src/core/sse3.h src/core/ssse3.h src/core/sse41.h src/core/gl.h)
 #dependencies
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)

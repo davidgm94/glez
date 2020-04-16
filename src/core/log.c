@@ -6,6 +6,7 @@
 #include <assert.h>
 #define STB_SPRINTF_IMPLEMENTATION
 #include "../ext/stb_sprintf.h"
+#include <unistd.h>
 
 frametime_record past_frame;
 frametime_record current_frame;
@@ -75,7 +76,15 @@ extern void frame_log_and_clear(void)
     frame_logger("\t* [TIME_FRAME_SUMMARY] CPU: %.02f%%. GPU: %.02f%%\n",
                  (current_frame.record[TIME_FRAME_CPU].ms / current_frame.record[TIME_FRAME_TOTAL].ms) * 100.0f,
                  (current_frame.record[TIME_FRAME_GPU].ms / current_frame.record[TIME_FRAME_TOTAL].ms) * 100.0f);
+    //struct timespec start, end, end2;
+    //clock_gettime(CLOCK_MONOTONIC, &start);
     fwrite(_g_print_string_buffer, _g_print_string_buffer_ptr - _g_print_string_buffer, 1, stdout);
+    //clock_gettime(CLOCK_MONOTONIC, &end);
+    //write(1, _g_print_string_buffer, _g_print_string_buffer_ptr - _g_print_string_buffer);
+    //clock_gettime(CLOCK_MONOTONIC, &end2);
+    //f64 crt = compute_ms(start, end);
+    //f64 syscall = compute_ms(end, end2);
+    //printf("%f crt, %f syscall", crt, syscall);
     // Reset the buffer
     _g_print_string_buffer_ptr = _g_print_string_buffer;
 }

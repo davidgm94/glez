@@ -1,4 +1,5 @@
 #pragma once
+#include <glad/glad.h>
 typedef int s_opengl_handle;
 typedef unsigned u_opengl_handle;
 
@@ -86,8 +87,8 @@ void shader_set_float(s_opengl_handle shader_program, const char* name, f32 valu
 //{
 //    glUniformMatrix4fv(glGetUniformLocation(shader_program, name), 1, GL_FALSE, (const GLfloat*) &m);
 //}
-void shader_set_mat4(s_opengl_handle shader_program, const char* name, mat4 m)
+void shader_set_mat4(s_opengl_handle shader_program, const char* name, mat4f m)
 {
-    glUniformMatrix4fv(glGetUniformLocation(shader_program, name), 1, GL_FALSE, (const GLfloat*) m);
+    glUniformMatrix4fv(glGetUniformLocation(shader_program, name), 1, GL_FALSE, (const GLfloat*)&m);
 }
 

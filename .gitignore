@@ -1,3 +1,8 @@
+VTune*
+.vs/
+x64/
 .idea/
+win32lib/
 *.backup
+*~
 cmake*

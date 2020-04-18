@@ -1,12 +1,15 @@
-#include "log.h"
 #include "type.h"
+#include "log.h"
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <assert.h>
 #define STB_SPRINTF_IMPLEMENTATION
-#include "../ext/stb_sprintf.h"
+#include <stb_sprintf.h>
+#if _WIN32
+#else
 #include <unistd.h>
+#endif
 
 frametime_record past_frame;
 frametime_record current_frame;

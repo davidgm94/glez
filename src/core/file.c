@@ -1,7 +1,10 @@
+#include "type.h"
 #include <stdio.h>
 #include <assert.h>
+#if _WIN32
+#elif __linux__
 #include <unistd.h>
-#include "type.h"
+#endif
 
 static char file_buffer[MEGABYTES(1024)];
 static char* file_buffer_ptr = file_buffer;
@@ -10,7 +13,10 @@ char* load_file(const char *name) {
 #ifdef GAME_DEBUG
     printf("[FILE] Reading file '%s'...\n", name);
     char cwd[1024];
+#if _WIN32
+#elif __linux__
     getcwd(cwd, sizeof(cwd));
+#endif
     printf("[FILE] Current working directory: %s\n", cwd);
 #endif
     FILE* file = fopen(name, "rb");

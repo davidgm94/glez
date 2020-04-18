@@ -1,6 +1,9 @@
 #pragma once
 
+#if _WIN32
+#elif __linux__
 #include <bits/types/struct_timespec.h>
+#endif
 #include <time.h>
 #include "type.h"
 
@@ -38,5 +41,5 @@ extern void frame_log_and_clear(void);
 
 extern frametime_record current_frame;
 
-#define BEGIN_TIME_BLOCK(name) clock_gettime(CLOCK_MONOTONIC, &current_frame.record[name].start)
-#define END_TIME_BLOCK(name) clock_gettime(CLOCK_MONOTONIC, &current_frame.record[name].end)
+//#define BEGIN_TIME_BLOCK(name) clock_gettime(CLOCK_MONOTONIC, &current_frame.record[name].start)
+//#define END_TIME_BLOCK(name) clock_gettime(CLOCK_MONOTONIC, &current_frame.record[name].end)

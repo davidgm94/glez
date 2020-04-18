@@ -2,22 +2,26 @@
 #include "log.h"
 #include <stdio.h>
 #include <string.h>
+#if _WIN32
+#include <Windows.h>
+#elif __linux__
 #include <unistd.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#endif
 #include <stddef.h>
 #include <stdbool.h>
-#include <cglm/cglm.h>
+#include "game_math.h"//#include <cglm/cglm.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include "sys.h"
 #include "file.h"
 #include "gl.h"
+#include <GLFW/glfw3.h>
+#include <stb_sprintf.h>
+
 
 typedef struct {
     u32 width, height;
 } window_dimension;
-
 
 typedef struct {
     f32 position[3];
@@ -80,7 +84,7 @@ u_opengl_handle load_texture(const char* filename, bool transparency)
 }
 
 typedef struct {
-    vec3 pos, front, up;
+    vec3f pos, front, up;
     f32 yaw;
     f32 pitch;
     f32 last_x, last_y;
@@ -108,20 +112,18 @@ void process_input(GLFWwindow *window)
 
     float camera_speed = 2.5f * delta_time;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        glm_vec3_muladds(game_camera.front, camera_speed, game_camera.pos);
+        vec3_muladds(game_camera.front, camera_speed, game_camera.pos);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        glm_vec3_muladds(game_camera.front, -camera_speed, game_camera.pos);
+        vec3_muladds(game_camera.front, -camera_speed, game_camera.pos);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        vec3 cross;
-        glm_vec3_cross(game_camera.front, game_camera.up, cross);
-        glm_vec3_normalize(cross);
-        glm_vec3_muladds(cross, -camera_speed, game_camera.pos);
+        vec3f cross = vec3_cross(game_camera.front, game_camera.up);
+        cross = vec3_normalize(cross);
+        game_camera.pos = vec3_muladds(cross, -camera_speed, game_camera.pos);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        vec3 cross;
-        glm_vec3_cross(game_camera.front, game_camera.up, cross);
-        glm_vec3_normalize(cross);
-        glm_vec3_muladds(cross, camera_speed, game_camera.pos);
+        vec3f cross = vec3_cross(game_camera.front, game_camera.up);
+        cross = vec3_normalize(cross);
+        game_camera.pos = vec3_muladds(cross, camera_speed, game_camera.pos);
     }
 
     float scale = 0.05f;
@@ -172,20 +174,20 @@ void glfw_cursor_pos_callback(GLFWwindow* window, f64 x, f64 y)
     if (pitch > 89.0f) pitch = 89.0f;
     if (pitch < -89.0f) pitch = -89.0f;
 
-    f32 rad_yaw = glm_rad(yaw);
-    f32 rad_pitch = glm_rad(pitch);
+    f32 rad_yaw = rad(yaw);
+    f32 rad_pitch = rad(pitch);
     f32 cos_rad_pitch = cosf(rad_pitch);
     f32 cos_rad_yaw = cosf(rad_yaw);
     f32 sin_rad_pitch = sinf(rad_pitch);
     f32 sin_rad_yaw = sinf(rad_yaw);
-    vec3 front = {
+    vec3f front = {
             cos_rad_yaw * cos_rad_pitch,
             sin_rad_pitch,
             sin_rad_yaw * cos_rad_pitch,
     };
 
 //    glm_vec3_normalize(front);
-    glm_vec3_copy(front, game_camera.front);
+    game_camera.front = front;
 
     game_camera.yaw = yaw;
     game_camera.pitch = pitch;
@@ -203,14 +205,56 @@ void glfw_scroll_callback(GLFWwindow* window, f64 x_offset, f64 y_offset)
     game_camera.fov = fov;
 }
 
-int main(int argc, char* argv[])
+char buffer[10000];
+void quick_debug(const char* format, ...)
 {
+    va_list va;
+    va_start(va, format);
+    stbsp_vsprintf(buffer, format, va);
+    va_end(va);
+    OutputDebugStringA(buffer);
+}
+
+#if _WIN32
+s32 WinMain(HINSTANCE instance, HINSTANCE previous_instance, LPSTR lpcmdline, s32 ncmdshow)
+#elif __linux__
+s32 main(int argc, char* argv[])
+#endif
+{
+    vec3f a = { 123.0f, 123.0f, 129.0f, 091023.0f};
+    vec3f b = { 1.0f, 123.0f, 129.0f, 18929.0f};
+    f32 result = vec3_dot(a, b);
+    quick_debug("%f\n", result);
+    //for (int i = 0; i < 10; i++)
+    //{
+    //    float aa = rand() % 10;
+    //    float ab = rand() % 10;
+    //    float ac = rand() % 10;
+
+    //    float ba = rand() % 10;
+    //    float bb = rand() % 10;
+    //    float bc = rand() % 10;
+    //    vec3f a = (vec3f){ aa, ab, ac, 0.0f };
+    //    vec3f b = (vec3f){ ba, 0918231.123f, bc, 0.0f };
+
+    //    vec3f c = vec3_cross_t(a, b);
+    //    vec3f c_simd = vec3_cross_simd(a, b);
+    //    if (vec3_equal(c, c_simd)) OutputDebugStringA("True");
+    //    else OutputDebugStringA("False");
+    //}
+    //exit(0);
 //    game_camera.pos[0] = 0.0f;
 //    game_camera.pos[1] = 0.0f;
 //    game_camera.pos[2] = 3.0f;
 //    game_camera.front[0] = 0.0f;
 //    game_camera.front[1] = 0.0f;
 //    game_camera.front[2] = -1.0f;
+
+
+//   GAME_START
+
+
+
 
     game_camera.pos[0] = 0.0f;
     game_camera.pos[1] = 20.0f;
@@ -318,7 +362,7 @@ int main(int argc, char* argv[])
             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
-    vec3 cube_positions[] = {
+    vec3f cube_positions[] = {
             {0.0f,  0.0f,  0.0f},
             {2.0f,  5.0f, -15.0f},
             {1.5f, -2.2f, -2.5f},
@@ -406,7 +450,7 @@ int main(int argc, char* argv[])
     while (!glfwWindowShouldClose(window))
     {
         frame_log_and_clear();
-        BEGIN_TIME_BLOCK(TIME_FRAME_TOTAL);
+        //BEGIN_TIME_BLOCK(TIME_FRAME_TOTAL);
         f32 _current_frame = glfwGetTime();
         delta_time = _current_frame - last_frame;
         last_frame = _current_frame;
@@ -416,15 +460,12 @@ int main(int argc, char* argv[])
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        mat4 view;
-        mat4 proj;
-        glm_perspective(glm_rad(game_camera.fov), (f32)w_dimension.width / (f32)w_dimension.height, 0.1f, 100.0f, proj);
-        vec3 camera_pos_plus_front;
-        glm_vec3_add(game_camera.pos, game_camera.front, camera_pos_plus_front);
-        glm_lookat(game_camera.pos, camera_pos_plus_front, game_camera.up, view);
+        mat4f proj = perspective(rad(game_camera.fov), (f32)w_dimension.width / (f32)w_dimension.height, 0.1f, 100.0f);
+        vec3f camera_pos_plus_front = vec3_add(game_camera.pos, game_camera.front);
+        mat4f view = lookat(game_camera.pos, camera_pos_plus_front, game_camera.up);
 
         /// BEGIN GPU
-        BEGIN_TIME_BLOCK(TIME_FRAME_GPU);
+        //BEGIN_TIME_BLOCK(TIME_FRAME_GPU);
         glUseProgram(shader_program);
 
         glActiveTexture(GL_TEXTURE0);
@@ -442,10 +483,10 @@ int main(int argc, char* argv[])
 
         for (u32 i = 0; i < COUNT_OF(cube_positions); i++)
         {
-            mat4 model = GLM_MAT4_IDENTITY;
-            glm_translate(model, cube_positions[i]);
+            mat4f model = MAT4_IDENTITY;
+            model = translate(model, cube_positions[i]);
             float angle = 20.0f * i;
-            glm_rotate(model, glm_rad(angle), (vec3) {1.0f, 0.3f, 0.5f});
+            model = rotate(model, rad(angle), (vec3f) {1.0f, 0.3f, 0.5f});
             shader_set_mat4(shader_program, "model", model);
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -455,10 +496,10 @@ int main(int argc, char* argv[])
         glBindVertexArray(floor_vao);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, floor_texture);
-        mat4 floor_model = GLM_MAT4_IDENTITY;
-        vec3 scale_v = {10.0f, 10.0f, 10.0f};
-        glm_scale(floor_model, scale_v);
-        glm_translate(floor_model, (vec3){floor_x, floor_y, floor_z });
+        mat4f floor_model = MAT4_IDENTITY;
+        vec3f scale_v = {10.0f, 10.0f, 10.0f};
+        floor_model = scale(floor_model, scale_v);
+        floor_model = translate(floor_model, (vec3f){floor_x, floor_y, floor_z });
         shader_set_mat4(floor_shader, "view", view);
         shader_set_mat4(floor_shader, "proj", proj);
         shader_set_mat4(floor_shader, "model", floor_model);
@@ -468,8 +509,8 @@ int main(int argc, char* argv[])
         glfwSwapBuffers(window);
         /// END GPU
 
-        END_TIME_BLOCK(TIME_FRAME_GPU);
-        END_TIME_BLOCK(TIME_FRAME_TOTAL);
+        //END_TIME_BLOCK(TIME_FRAME_GPU);
+        //END_TIME_BLOCK(TIME_FRAME_TOTAL);
 
         // TODO: this cripples performance when moving the window, use with care
         //  frame_set_window_title(window);

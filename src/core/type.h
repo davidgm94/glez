@@ -1,4 +1,7 @@
 #pragma once
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS 1
+#endif
 
 /*** GAME CONTROLS ***/
 
@@ -32,5 +35,6 @@ typedef double f64;
 #define VECTOR_TYPE(length) __attribute__((ext_vector_type(length)))
 #define VECTOR_TYPE_ALIGNMENT(length, alignment) __attribute__((ext_vector_type(length))) __attribute__((aligned(alignment)))
 #define INTRINSIC_INLINE __inline__
+#define ALIGNED(bytes) __declspec(align(bytes))
 
 #define my_offsetof(t, d)  __builtin_offsetof(t, d)

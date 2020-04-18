@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\allocator.cpp" />
+    <ClCompile Include="src\clusterizer.cpp" />
+    <ClCompile Include="src\indexcodec.cpp" />
+    <ClCompile Include="src\indexgenerator.cpp" />
+    <ClCompile Include="src\overdrawanalyzer.cpp" />
+    <ClCompile Include="src\overdrawoptimizer.cpp" />
+    <ClCompile Include="src\simplifier.cpp" />
+    <ClCompile Include="src\spatialorder.cpp" />
+    <ClCompile Include="src\stripifier.cpp" />
+    <ClCompile Include="src\vcacheanalyzer.cpp" />
+    <ClCompile Include="src\vcacheoptimizer.cpp" />
+    <ClCompile Include="src\vertexcodec.cpp" />
+    <ClCompile Include="src\vfetchanalyzer.cpp" />
+    <ClCompile Include="src\vfetchoptimizer.cpp" />
+    <ClCompile Include="tools\basistoktx.cpp" />
+    <ClCompile Include="tools\gltfpack.cpp" />
+    <ClCompile Include="tools\lodviewer.cpp" />
+    <ClCompile Include="tools\meshloader.cpp" />
+    <ClCompile Include="tools\vcachetester.cpp" />
+    <ClCompile Include="tools\vcachetuner.cpp" />
+    <ClCompile Include="demo\ansi.c" />
+    <ClCompile Include="demo\main.cpp" />
+    <ClCompile Include="demo\miniz.cpp" />
+    <ClCompile Include="demo\tests.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\meshoptimizer.h" />
+    <ClInclude Include="tools\basisu_format.h" />
+    <ClInclude Include="tools\cgltf.h" />
+    <ClInclude Include="tools\fast_obj.h" />
+    <ClInclude Include="tools\khr_df.h" />
+    <ClInclude Include="tools\ktx2_format.h" />
+    <ClInclude Include="demo\miniz.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="demo\demo.html" />
+    <None Include="demo\index.html" />
+  </ItemGroup>
+</Project>

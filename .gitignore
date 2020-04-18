@@ -5,4 +5,5 @@ x64/
 win32lib/
 *.backup
 *~
+*.log
 cmake*

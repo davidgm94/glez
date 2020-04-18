@@ -4,6 +4,7 @@
     <ClCompile Include="src\core\main.c" />
     <ClCompile Include="src\core\file.c" />
     <ClCompile Include="src\core\log.c" />
+    <ClCompile Include="src\core\model.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\core\mmx.h" />
@@ -23,5 +24,6 @@
     <ClInclude Include="src\core\gl.h" />
     <ClInclude Include="src\ext\stb\stb_image.h" />
     <ClInclude Include="src\ext\stb\stb_sprintf.h" />
+    <ClInclude Include="src\core\model.h" />
   </ItemGroup>
 </Project>

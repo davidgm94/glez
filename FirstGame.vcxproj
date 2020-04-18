@@ -18,6 +18,7 @@
     <ClCompile Include="src\core\file.c" />
     <ClCompile Include="src\core\log.c" />
     <ClCompile Include="src\core\main.c" />
+    <ClCompile Include="src\core\model.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\core\boilerplate_str.h" />
@@ -27,6 +28,7 @@
     <ClInclude Include="src\core\gl.h" />
     <ClInclude Include="src\core\log.h" />
     <ClInclude Include="src\core\mmx.h" />
+    <ClInclude Include="src\core\model.h" />
     <ClInclude Include="src\core\shader.h" />
     <ClInclude Include="src\core\sse.h" />
     <ClInclude Include="src\core\sse2.h" />
@@ -95,7 +97,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <CompileAs>CompileAsC</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -106,7 +108,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\stb;$(SolutionDir)src\ext\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\ext\meshoptimizer\tools;$(SolutionDir)src\ext\meshoptimizer\src;$(SolutionDir)src\ext\cglm\include;$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\stb;$(SolutionDir)src\ext\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -123,7 +125,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CRT_SECURE_NO_WARNINGS;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <CompileAs>CompileAsC</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -134,7 +136,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\stb;$(SolutionDir)src\ext\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\ext\meshoptimizer\tools;$(SolutionDir)src\ext\meshoptimizer\src;$(SolutionDir)src\ext\cglm\include;$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\stb;$(SolutionDir)src\ext\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -153,7 +155,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CRT_SECURE_NO_WARNINGS;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <CompileAs>CompileAsC</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -164,7 +166,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\stb;$(SolutionDir)src\ext\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\ext\meshoptimizer\tools;$(SolutionDir)src\ext\meshoptimizer\src;$(SolutionDir)src\ext\cglm\include;$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\stb;$(SolutionDir)src\ext\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -87,8 +87,15 @@ void shader_set_float(s_opengl_handle shader_program, const char* name, f32 valu
 //{
 //    glUniformMatrix4fv(glGetUniformLocation(shader_program, name), 1, GL_FALSE, (const GLfloat*) &m);
 //}
+#if GLM_DEBUG
+void shader_set_mat4(s_opengl_handle shader_program, const char* name, mat4 m)
+{
+    glUniformMatrix4fv(glGetUniformLocation(shader_program, name), 1, GL_FALSE, (const GLfloat*)m);
+}
+#else
 void shader_set_mat4(s_opengl_handle shader_program, const char* name, mat4f m)
 {
     glUniformMatrix4fv(glGetUniformLocation(shader_program, name), 1, GL_FALSE, (const GLfloat*)&m);
 }
+#endif
 

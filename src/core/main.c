@@ -1,3 +1,11 @@
+// Program options
+#define GLM_DEBUG 0
+#define FILE_DEBUGGING 0
+#define DOUBLE_BUFFER 1
+
+#if GLM_DEBUG
+#include <cglm/cglm.h>
+#endif
 #include "type.h"
 #include "log.h"
 #include <stdio.h>
@@ -17,7 +25,6 @@
 #include "gl.h"
 #include <GLFW/glfw3.h>
 #include <stb_sprintf.h>
-
 
 typedef struct {
     u32 width, height;
@@ -84,7 +91,11 @@ u_opengl_handle load_texture(const char* filename, bool transparency)
 }
 
 typedef struct {
+#if GLM_DEBUG
+    vec3 pos, front, up;
+#else
     vec3f pos, front, up;
+#endif
     f32 yaw;
     f32 pitch;
     f32 last_x, last_y;
@@ -110,11 +121,30 @@ void process_input(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
+#if GLM_DEBUG
     float camera_speed = 2.5f * delta_time;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        vec3_muladds(game_camera.front, camera_speed, game_camera.pos);
+        glm_vec3_muladds(game_camera.front, camera_speed, game_camera.pos);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        vec3_muladds(game_camera.front, -camera_speed, game_camera.pos);
+        glm_vec3_muladds(game_camera.front, -camera_speed, game_camera.pos);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        vec3 cross;
+        glm_vec3_cross(game_camera.front, game_camera.up, cross);
+        glm_vec3_normalize(cross);
+        glm_vec3_muladds(cross, -camera_speed, game_camera.pos);
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        vec3 cross;
+        glm_vec3_cross(game_camera.front, game_camera.up, cross);
+        glm_vec3_normalize(cross);
+        glm_vec3_muladds(cross, camera_speed, game_camera.pos);
+    }
+#else
+    float camera_speed = 2.5f * delta_time;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        game_camera.pos = vec3_muladds(game_camera.front, camera_speed, game_camera.pos);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		game_camera.pos = vec3_muladds(game_camera.front, -camera_speed, game_camera.pos);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         vec3f cross = vec3_cross(game_camera.front, game_camera.up);
         cross = vec3_normalize(cross);
@@ -125,6 +155,7 @@ void process_input(GLFWwindow *window)
         cross = vec3_normalize(cross);
         game_camera.pos = vec3_muladds(cross, camera_speed, game_camera.pos);
     }
+#endif
 
     float scale = 0.05f;
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
@@ -180,6 +211,16 @@ void glfw_cursor_pos_callback(GLFWwindow* window, f64 x, f64 y)
     f32 cos_rad_yaw = cosf(rad_yaw);
     f32 sin_rad_pitch = sinf(rad_pitch);
     f32 sin_rad_yaw = sinf(rad_yaw);
+#if GLM_DEBUG
+    vec3 front = {
+            cos_rad_yaw * cos_rad_pitch,
+            sin_rad_pitch,
+            sin_rad_yaw * cos_rad_pitch,
+    };
+
+    glm_vec3_normalize(front);
+    glm_vec3_copy(front, game_camera.front);
+#else
     vec3f front = {
             cos_rad_yaw * cos_rad_pitch,
             sin_rad_pitch,
@@ -188,7 +229,7 @@ void glfw_cursor_pos_callback(GLFWwindow* window, f64 x, f64 y)
 
 //    glm_vec3_normalize(front);
     game_camera.front = front;
-
+#endif
     game_camera.yaw = yaw;
     game_camera.pitch = pitch;
 }
@@ -215,34 +256,48 @@ void quick_debug(const char* format, ...)
     OutputDebugStringA(buffer);
 }
 
+void add_to_file_profiling(FILE* file, const char* fmt, ...)
+{
+    char buffer[4096];
+    va_list va;
+    va_start(va, fmt);
+    int len = stbsp_vsprintf(buffer, fmt, va);
+    va_end(va);
+    fwrite(buffer, len, 1, file);
+}
+
+#if GLM_DEBUG
+void write_matrix(mat4 m, FILE* file, const char* matrix_name)
+#else
+void write_matrix(mat4f m, FILE* file, const char* matrix_name)
+#endif
+{
+    char buffer[2048];
+    int byte_ptr = stbsp_sprintf(buffer, "Matrix %s\n[\n", matrix_name);
+    for (int i = 0; i < 4; i++)
+    {
+        byte_ptr += stbsp_sprintf(buffer + byte_ptr, "\t{");
+        for (int j = 0; j < 4; j++)
+        {
+#if GLM_DEBUG
+            f32 n = m[i][j];
+#else
+            f32 n = m.row[i][j];
+#endif
+            byte_ptr += stbsp_sprintf(buffer + byte_ptr, " %f, ", n);
+        }
+        byte_ptr += stbsp_sprintf(buffer + byte_ptr, "}\n");
+    }
+    byte_ptr += stbsp_sprintf(buffer + byte_ptr, "]\n\n");
+    fwrite(buffer, byte_ptr, 1, file);
+}
+
 #if _WIN32
 s32 WinMain(HINSTANCE instance, HINSTANCE previous_instance, LPSTR lpcmdline, s32 ncmdshow)
 #elif __linux__
 s32 main(int argc, char* argv[])
 #endif
 {
-    vec3f a = { 123.0f, 123.0f, 129.0f, 091023.0f};
-    vec3f b = { 1.0f, 123.0f, 129.0f, 18929.0f};
-    f32 result = vec3_dot(a, b);
-    quick_debug("%f\n", result);
-    //for (int i = 0; i < 10; i++)
-    //{
-    //    float aa = rand() % 10;
-    //    float ab = rand() % 10;
-    //    float ac = rand() % 10;
-
-    //    float ba = rand() % 10;
-    //    float bb = rand() % 10;
-    //    float bc = rand() % 10;
-    //    vec3f a = (vec3f){ aa, ab, ac, 0.0f };
-    //    vec3f b = (vec3f){ ba, 0918231.123f, bc, 0.0f };
-
-    //    vec3f c = vec3_cross_t(a, b);
-    //    vec3f c_simd = vec3_cross_simd(a, b);
-    //    if (vec3_equal(c, c_simd)) OutputDebugStringA("True");
-    //    else OutputDebugStringA("False");
-    //}
-    //exit(0);
 //    game_camera.pos[0] = 0.0f;
 //    game_camera.pos[1] = 0.0f;
 //    game_camera.pos[2] = 3.0f;
@@ -250,10 +305,7 @@ s32 main(int argc, char* argv[])
 //    game_camera.front[1] = 0.0f;
 //    game_camera.front[2] = -1.0f;
 
-
 //   GAME_START
-
-
 
 
     game_camera.pos[0] = 0.0f;
@@ -362,6 +414,20 @@ s32 main(int argc, char* argv[])
             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
+#if GLM_DEBUG
+    vec3 cube_positions[] = {
+            {0.0f,  0.0f,  0.0f},
+            {2.0f,  5.0f, -15.0f},
+            {1.5f, -2.2f, -2.5f},
+            {3.8f, -2.0f, -12.3f},
+            {2.4f, -0.4f, -3.5f},
+            {1.7f,  3.0f, -7.5f},
+            {1.3f, -2.0f, -2.5f},
+            {1.5f,  2.0f, -2.5f},
+            {1.5f,  0.2f, -1.5f},
+            {1.3f,  1.0f, -1.5f},
+    };
+#else
     vec3f cube_positions[] = {
             {0.0f,  0.0f,  0.0f},
             {2.0f,  5.0f, -15.0f},
@@ -374,6 +440,7 @@ s32 main(int argc, char* argv[])
             {1.5f,  0.2f, -1.5f},
             {1.3f,  1.0f, -1.5f},
     };
+#endif
 
     pos_tex_vertex floor_vertices[6] = {
             [0] = {
@@ -456,13 +523,32 @@ s32 main(int argc, char* argv[])
         last_frame = _current_frame;
         glfwPollEvents();
         process_input(window);
+#if FILE_DEBUGGING
+#if GLM_DEBUG
+        FILE* profile_frame_file = fopen("profile_glm.log", "w+");
+#else
+        FILE* profile_frame_file = fopen("profile_noglm.log", "w+");
+#endif
+        add_to_file_profiling(profile_frame_file, "PROFILING FRAME:\n\n");
+#endif
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+#if GLM_DEBUG
+        mat4 proj, view;
+        glm_perspective(rad(game_camera.fov), (f32)w_dimension.width / (f32)w_dimension.height, 0.1f, 100.0f, proj);
+        vec3 sum;
+        glm_vec3_add(game_camera.pos, game_camera.front, sum);
+        glm_lookat(game_camera.pos, sum, game_camera.up, view);
+#else
         mat4f proj = perspective(rad(game_camera.fov), (f32)w_dimension.width / (f32)w_dimension.height, 0.1f, 100.0f);
-        vec3f camera_pos_plus_front = vec3_add(game_camera.pos, game_camera.front);
-        mat4f view = lookat(game_camera.pos, camera_pos_plus_front, game_camera.up);
+        mat4f view = lookat(game_camera.pos, vec3_add(game_camera.pos, game_camera.front), game_camera.up);
+#endif
+#if FILE_DEBUGGING
+        write_matrix(proj, profile_frame_file, "Projection matrix");
+        write_matrix(view, profile_frame_file, "View matrix");
+#endif
 
         /// BEGIN GPU
         //BEGIN_TIME_BLOCK(TIME_FRAME_GPU);
@@ -483,10 +569,22 @@ s32 main(int argc, char* argv[])
 
         for (u32 i = 0; i < COUNT_OF(cube_positions); i++)
         {
+#if GLM_DEBUG
+            mat4 model = GLM_MAT4_IDENTITY;
+            glm_translate(model, cube_positions[i]);
+            float angle = 20.0f * i;
+            glm_rotate(model, rad(angle), (vec3) {1.0f, 0.3f, 0.5f});
+#else
             mat4f model = MAT4_IDENTITY;
             model = translate(model, cube_positions[i]);
             float angle = 20.0f * i;
-            model = rotate(model, rad(angle), (vec3f) {1.0f, 0.3f, 0.5f});
+            model = rotate(model, rad(angle), (vec3f) {1.0f, 0.3f, 0.5f, 0.0f});
+#endif
+#if FILE_DEBUGGING
+            char name[10];
+            stbsp_sprintf(name, "Model %u", i);
+            write_matrix(model, profile_frame_file, name);
+#endif
             shader_set_mat4(shader_program, "model", model);
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -496,10 +594,20 @@ s32 main(int argc, char* argv[])
         glBindVertexArray(floor_vao);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, floor_texture);
+#if GLM_DEBUG
+        mat4 floor_model = GLM_MAT4_IDENTITY;
+        vec3 scale_v = {10.0f, 10.0f, 10.0f};
+        glm_scale(floor_model, scale_v);
+        glm_translate(floor_model, (vec3){floor_x, floor_y, floor_z });
+#else
         mat4f floor_model = MAT4_IDENTITY;
         vec3f scale_v = {10.0f, 10.0f, 10.0f};
         floor_model = scale(floor_model, scale_v);
         floor_model = translate(floor_model, (vec3f){floor_x, floor_y, floor_z });
+#endif
+#if FILE_DEBUGGING
+        write_matrix(floor_model, profile_frame_file, "Floor model");
+#endif
         shader_set_mat4(floor_shader, "view", view);
         shader_set_mat4(floor_shader, "proj", proj);
         shader_set_mat4(floor_shader, "model", floor_model);
@@ -508,6 +616,10 @@ s32 main(int argc, char* argv[])
         // glFlush();
         glfwSwapBuffers(window);
         /// END GPU
+#if FILE_DEBUGGING
+        fclose(profile_frame_file);
+        exit(0);
+#endif
 
         //END_TIME_BLOCK(TIME_FRAME_GPU);
         //END_TIME_BLOCK(TIME_FRAME_TOTAL);

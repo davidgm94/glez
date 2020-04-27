@@ -76,38 +76,37 @@ f32 floor_x = 0.0f;
 f32 floor_y = 0.0f;
 f32 floor_z = 0.0f;
 
-//typedef struct {
-//#if GLM_DEBUG
-//    vec3 pos, front, up, right, world_up;
-//#else
-//    vec3f pos, front, up, right, world_up;
-//#endif
-//    f32 yaw;
-//    f32 pitch;
-//    f32 last_x, last_y;
-//    f32 dx, dy;
-//    f32 fov;
-//    f32 mov_speed;
-//    f32 turn_speed;
-//    bool first_mouse;
-//} camera;
-//
+typedef struct {
+    vec3f position;
+    vec3f front;
+    vec3f up;
+    f32 yaw;
+    f32 pitch;
+    f32 last_x, last_y;
+} game_camera;
+
+f32 fov;
+bool first_mouse = true;
+game_camera camera;
+
+void init_camera(game_camera* camera)
+{
+	camera->position = VEC3(0.0f, 0.0f, 3.0f);
+	camera->front = VEC3(0.0f, 0.0f, -1.0f);
+	camera->up = VEC3(0.01f, 1.0f, 0.0f);
+
+	camera->yaw = -90.0f;
+	camera->pitch = 0.0f;
+	camera->last_x = 1024 / 2.0f;
+	camera->last_y = 576 / 2.0f;
+	fov = 45.0f;
+}
+
 //typedef struct quat_camera {
 //    quat rotation;
 //    vec3f position;
 //    f32 scale;
 //} quat_camera;
-
-vec3f camera_position = VEC3(0.0f, 0.0f, 3.0f);
-vec3f camera_front = VEC3(0.0f, 0.0f, -1.0f);
-vec3f camera_up = VEC3(0.01f, 1.0f, 0.0f);
-
-bool first_mouse = true;
-f32 yaw = -90.0f;
-f32 pitch = 0.0f;
-f32 last_x = 1024 / 2.0f;
-f32 last_y = 576 / 2.0f;
-f32 fov = 45.0f;
 
 void rest_of_the_game_input(GLFWwindow* window)
 {
@@ -138,21 +137,20 @@ void rest_of_the_game_input(GLFWwindow* window)
 
 void process_input(GLFWwindow *window)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+    glfwSetWindowShouldClose(window, glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS);
 
     f32 camera_speed = 2.5f * delta_time;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        camera_position += camera_speed * camera_front;
+        camera.position += camera_speed * camera.front;
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        camera_position -= camera_speed * camera_front;
+        camera.position -= camera_speed * camera.front;
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        camera_position -= vec3_normalize(vec3_cross(camera_front, camera_up)) * camera_speed;
+        camera.position -= vec3_normalize(vec3_cross(camera.front, camera.up)) * camera_speed;
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        camera_position += vec3_normalize(vec3_cross(camera_front, camera_up)) * camera_speed;
+        camera.position += vec3_normalize(vec3_cross(camera.front, camera.up)) * camera_speed;
     }
 
     rest_of_the_game_input(window);
@@ -171,33 +169,33 @@ void glfw_scroll_callback(GLFWwindow* window, f64 x_offset, f64 y_offset)
 void glfw_cursor_callback(GLFWwindow* window, f64 x, f64 y)
 {
     if (first_mouse) {
-        last_x = x;
-        last_y = y;
+        camera.last_x = x;
+        camera.last_y = y;
         first_mouse = false;
     }
 
-    f32 x_offset = x - last_x;
-    f32 y_offset = last_y - y;
-    last_x = x;
-    last_y = y;
+    f32 x_offset = x - camera.last_x;
+    f32 y_offset = camera.last_y - y;
+    camera.last_x = x;
+    camera.last_y = y;
 
     f32 sensitivity = 0.1f;
     x_offset *= sensitivity;
     y_offset *= sensitivity;
 
-    yaw += x_offset;
-    pitch += y_offset;
+    camera.yaw += x_offset;
+    camera.pitch += y_offset;
 
-    if (pitch > 89.0f)
-        pitch = 89.0f;
-    if (pitch < -89.0f)
-        pitch = -89.0f;
+    if (camera.pitch > 89.0f)
+        camera.pitch = 89.0f;
+    if (camera.pitch < -89.0f)
+        camera.pitch = -89.0f;
 
     vec3f front;
-    front.x = cosf(rad(yaw)) * cosf(rad(pitch));
-    front.y = sinf(rad(pitch));
-    front.z = sinf(rad(yaw)) * cosf(rad(pitch));
-    camera_front = vec3_normalize(front);
+    front.x = cosf(rad(camera.yaw)) * cosf(rad(camera.pitch));
+    front.y = sinf(rad(camera.pitch));
+    front.z = sinf(rad(camera.yaw)) * cosf(rad(camera.pitch));
+    camera.front = vec3_normalize(front);
 }
 
 char buffer[10000];
@@ -288,11 +286,12 @@ typedef struct {
 } game_object_3d;
 
 #if _WIN32
-s32 WinMain(HINSTANCE instance, HINSTANCE previous_instance, LPSTR lpcmdline, s32 ncmdshow)
+s32 WINAPI WinMain(HINSTANCE instance, HINSTANCE previous_instance, LPSTR lpcmdline, s32 ncmdshow)
 #elif __linux__
 s32 main(int argc, char* argv[])
 #endif
 {
+    init_camera(&camera);
     QueryPerformanceFrequency((LARGE_INTEGER*)&__game_performance_freq);
     mesh m = load_mesh("assets/mario/mario.obj");
     player_front = VEC3(0.0f, 0.0f, -1.0f);
@@ -568,7 +567,7 @@ s32 main(int argc, char* argv[])
         glm_lookat(game_camera.pos, sum, game_camera.up, view);
 #else
         mat4f proj = perspective(rad(fov), (f32)w_dimension.width / (f32)w_dimension.height, 0.1f, 100.0f);
-        mat4f view = lookat(camera_position, camera_position + camera_front, camera_up);
+        mat4f view = lookat(camera.position, camera.position + camera.front, camera.up);
 #endif
 #if FILE_DEBUGGING
         write_matrix(proj, profile_frame_file, "Projection matrix");

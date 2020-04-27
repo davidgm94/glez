@@ -51,7 +51,7 @@ window_dimension w_dimension = {
         .height = 576,
 };
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+void framebuffer_size_callback(GLFWwindow* window, s32 width, s32 height)
 {
     glViewport(0, 0, width, height);
     w_dimension.width = width;
@@ -76,147 +76,41 @@ f32 floor_x = 0.0f;
 f32 floor_y = 0.0f;
 f32 floor_z = 0.0f;
 
-typedef struct {
-#if GLM_DEBUG
-    vec3 pos, front, up, right, world_up;
-#else
-    vec3f pos, front, up, right, world_up;
-#endif
-    f32 yaw;
-    f32 pitch;
-    f32 last_x, last_y;
-    f32 dx, dy;
-    f32 fov;
-    f32 mov_speed;
-    f32 turn_speed;
-    bool first_mouse;
-} camera;
+//typedef struct {
+//#if GLM_DEBUG
+//    vec3 pos, front, up, right, world_up;
+//#else
+//    vec3f pos, front, up, right, world_up;
+//#endif
+//    f32 yaw;
+//    f32 pitch;
+//    f32 last_x, last_y;
+//    f32 dx, dy;
+//    f32 fov;
+//    f32 mov_speed;
+//    f32 turn_speed;
+//    bool first_mouse;
+//} camera;
+//
+//typedef struct quat_camera {
+//    quat rotation;
+//    vec3f position;
+//    f32 scale;
+//} quat_camera;
 
-typedef struct quat_camera {
-    quat rotation;
-    vec3f position;
-    f32 scale;
-} quat_camera;
+vec3f camera_position = VEC3(0.0f, 0.0f, 3.0f);
+vec3f camera_front = VEC3(0.0f, 0.0f, -1.0f);
+vec3f camera_up = VEC3(0.01f, 1.0f, 0.0f);
 
-#if FASTER_SHADER_MATH
-quat_camera game_camera;
-#else
-camera game_camera;
-#endif
+bool first_mouse = true;
+f32 yaw = -90.0f;
+f32 pitch = 0.0f;
+f32 last_x = 1024 / 2.0f;
+f32 last_y = 576 / 2.0f;
+f32 fov = 45.0f;
 
-#if ALTERNATIVE_CAMERA
-void update(void)
+void rest_of_the_game_input(GLFWwindow* window)
 {
-    game_camera.front.x = cosf(rad(game_camera.yaw)) * cosf(rad(game_camera.pitch));
-    game_camera.front.y = sinf(rad(game_camera.pitch));
-    game_camera.front.z = sinf(rad(game_camera.yaw)) * cosf(rad(game_camera.pitch));
-    game_camera.front = vec3_normalize(game_camera.front);
-
-    game_camera.right = vec3_normalize(vec3_cross(game_camera.front, game_camera.world_up));
-    game_camera.up = vec3_normalize(vec3_cross(game_camera.right, game_camera.world_up));
-}
-
-void init_camera(vec3f position, vec3f up, f32 yaw, f32 pitch, f32 move_speed, f32 turn_speed)
-{
-    game_camera.pos = position;
-    game_camera.up = up;
-    game_camera.yaw = yaw;
-    game_camera.pitch = pitch;
-    game_camera.mov_speed = move_speed;
-    game_camera.turn_speed = turn_speed;
-    game_camera.front = VEC3(0.0f, 0.0f, -1.0f);
-
-    update();
-}
-
-void glfw_new_process_input(GLFWwindow* window)
-{
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        game_camera.pos += game_camera.front * game_camera.mov_speed * delta_time;
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        game_camera.pos -= game_camera.front * game_camera.mov_speed * delta_time;
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        game_camera.pos -= game_camera.right * game_camera.mov_speed * delta_time;
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        game_camera.pos += game_camera.right * game_camera.mov_speed * delta_time;
-    }
-}
-
-mat4f get_view_matrix(void)
-{
-    return lookat(game_camera.pos, game_camera.pos + game_camera.front, game_camera.up);
-}
-
-void glfw_new_mouse_callback(GLFWwindow* window, f64 xPos, f64 yPos)
-{
-    f32 x = xPos; f32 y = yPos;
-
-    if (game_camera.first_mouse)
-    {
-        game_camera.last_x = x;
-        game_camera.last_y = y;
-        game_camera.first_mouse = false;
-    }
-
-    f32 lastx = game_camera.last_x;
-    f32 lasty = game_camera.last_y;
-
-    f32 dx = x - lastx;
-    f32 dy = lasty - y;
-    game_camera.dx = dx;
-    game_camera.dy = dy;
-
-    game_camera.last_x = x;
-    game_camera.last_y = y;
-
-    frame_logger("x: %.6f, y: %.6f\n", dx, dy);
-}
-
-#else
-void process_input(GLFWwindow *window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-
-#if GLM_DEBUG
-    float camera_speed = 2.5f * delta_time;
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        glm_vec3_muladds(game_camera.front, camera_speed, game_camera.pos);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        glm_vec3_muladds(game_camera.front, -camera_speed, game_camera.pos);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        vec3 cross;
-        glm_vec3_cross(game_camera.front, game_camera.up, cross);
-        glm_vec3_normalize(cross);
-        glm_vec3_muladds(cross, -camera_speed, game_camera.pos);
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        vec3 cross;
-        glm_vec3_cross(game_camera.front, game_camera.up, cross);
-        glm_vec3_normalize(cross);
-        glm_vec3_muladds(cross, camera_speed, game_camera.pos);
-    }
-#else
-    f32 camera_speed = 2.5f * delta_time;
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        game_camera.pos = vec3_muladds(game_camera.front, camera_speed, game_camera.pos);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		game_camera.pos = vec3_muladds(game_camera.front, -camera_speed, game_camera.pos);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        vec3f cross = vec3_cross(game_camera.front, game_camera.up);
-        cross = vec3_normalize(cross);
-        game_camera.pos = vec3_muladds(cross, -camera_speed, game_camera.pos);
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        vec3f cross = vec3_cross(game_camera.front, game_camera.up);
-        cross = vec3_normalize(cross);
-        game_camera.pos = vec3_muladds(cross, camera_speed, game_camera.pos);
-    }
-#endif
-
     f32 mario_speed = 250.0f * delta_time;
     f32 experimental_speed = 250.0f * delta_time;
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
@@ -227,8 +121,8 @@ void process_input(GLFWwindow *window)
         player_x -= mario_speed;
         player_front.z -= experimental_speed;
     }
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		player_x += mario_speed;
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+        player_x += mario_speed;
         player_front.z += experimental_speed;
     }
 
@@ -242,75 +136,68 @@ void process_input(GLFWwindow *window)
         floor_x += mario_speed;
 }
 
-
-// Not used
-void glfw_cursor_pos_callback(GLFWwindow* window, f64 x, f64 y)
+void process_input(GLFWwindow *window)
 {
-    if (game_camera.first_mouse)
-    {
-        game_camera.last_x = x;
-        game_camera.last_y = y;
-        game_camera.first_mouse = false;
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+    f32 camera_speed = 2.5f * delta_time;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        camera_position += camera_speed * camera_front;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        camera_position -= camera_speed * camera_front;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        camera_position -= vec3_normalize(vec3_cross(camera_front, camera_up)) * camera_speed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        camera_position += vec3_normalize(vec3_cross(camera_front, camera_up)) * camera_speed;
     }
 
-    f32 x_offset = (f32)x - game_camera.last_x;
-    f32 y_offset = game_camera.last_y - (f32)y;
-    game_camera.last_x = x;
-    game_camera.last_x = y;
+    rest_of_the_game_input(window);
+}
 
-    f32 yaw = game_camera.yaw;
-    f32 pitch = game_camera.pitch;
+void glfw_scroll_callback(GLFWwindow* window, f64 x_offset, f64 y_offset)
+{
+    if (fov >= 1.0f && fov <= 45.0f)
+        fov -= 2.0f * y_offset;
+    if (fov <= 1.0f)
+        fov = 1.0f;
+    if (fov >= 45.0f)
+        fov = 45.0f;
+}
 
-    f32 sensitivity = 0.00005f;
+void glfw_cursor_callback(GLFWwindow* window, f64 x, f64 y)
+{
+    if (first_mouse) {
+        last_x = x;
+        last_y = y;
+        first_mouse = false;
+    }
+
+    f32 x_offset = x - last_x;
+    f32 y_offset = last_y - y;
+    last_x = x;
+    last_y = y;
+
+    f32 sensitivity = 0.1f;
     x_offset *= sensitivity;
     y_offset *= sensitivity;
 
     yaw += x_offset;
     pitch += y_offset;
 
-    if (pitch > 89.0f) pitch = 89.0f;
-    if (pitch < -89.0f) pitch = -89.0f;
+    if (pitch > 89.0f)
+        pitch = 89.0f;
+    if (pitch < -89.0f)
+        pitch = -89.0f;
 
-    f32 rad_yaw = rad(yaw);
-    f32 rad_pitch = rad(pitch);
-    f32 cos_rad_pitch = cosf(rad_pitch);
-    f32 cos_rad_yaw = cosf(rad_yaw);
-    f32 sin_rad_pitch = sinf(rad_pitch);
-    f32 sin_rad_yaw = sinf(rad_yaw);
-#if GLM_DEBUG
-    vec3 front = {
-            cos_rad_yaw * cos_rad_pitch,
-            sin_rad_pitch,
-            sin_rad_yaw * cos_rad_pitch,
-    };
-
-    glm_vec3_normalize(front);
-    glm_vec3_copy(front, game_camera.front);
-#else
-    vec3f front = {
-            cos_rad_yaw * cos_rad_pitch,
-            sin_rad_pitch,
-            sin_rad_yaw * cos_rad_pitch,
-    };
-
-//    glm_vec3_normalize(front);
-    game_camera.front = front;
-#endif
-    game_camera.yaw = yaw;
-    game_camera.pitch = pitch;
-}
-#endif
-
-void glfw_scroll_callback(GLFWwindow* window, f64 x_offset, f64 y_offset)
-{
-    f32 fov = game_camera.fov;
-    if (fov >= 1.0f && fov <= 45.0f)
-        fov -= y_offset;
-    if (fov <= 1.0f)
-        fov = 1.0f;
-    if (fov >= 45.0f)
-        fov = 45.0f;
-    game_camera.fov = fov;
+    vec3f front;
+    front.x = cosf(rad(yaw)) * cosf(rad(pitch));
+    front.y = sinf(rad(pitch));
+    front.z = sinf(rad(yaw)) * cosf(rad(pitch));
+    camera_front = vec3_normalize(front);
 }
 
 char buffer[10000];
@@ -408,49 +295,6 @@ s32 main(int argc, char* argv[])
 {
     QueryPerformanceFrequency((LARGE_INTEGER*)&__game_performance_freq);
     mesh m = load_mesh("assets/mario/mario.obj");
-//    game_camera.pos[0] = 0.0f;
-//    game_camera.pos[1] = 0.0f;
-//    game_camera.pos[2] = 3.0f;
-//    game_camera.front[0] = 0.0f;
-//    game_camera.front[1] = 0.0f;
-//    game_camera.front[2] = -1.0f;
-
-//   GAME_START
-
-    memset(&game_camera, 0, sizeof(game_camera));
-#if 0
-    init_camera(VEC3(0.0f, 0.0f, 0.0f), VEC3(0.0f, 1.0f, 0.0f), 0.0f, 0.0f, 5.0f, 1.0f);
-#else
-    game_camera.pos[0] = 0.0f;
-    game_camera.pos[1] = 20.0f;
-    game_camera.pos[2] = 20.0f;
-
-    game_camera.front[0] = 0.0f;
-    game_camera.front[1] = -1.0f;
-    game_camera.front[2] = -1.0f;
-
-#if 1
-    game_camera.up[0] = 0.0f;
-    game_camera.up[1] = 1.0f;
-    game_camera.up[2] = 0.0f;
-
-    game_camera.world_up = VEC3(0.0f, 1.0f, 0.0f);
-#endif
-
-    game_camera.yaw = -90.0f;
-    game_camera.pitch = 0.0f;
-    game_camera.right = VEC3(1.0f, 0.0f, 0.0f);
-    game_camera.mov_speed = 10.0f;
-    game_camera.turn_speed = 1.0f;
-
-
-
-#endif
-    game_camera.last_x = w_dimension.width / 2.0f;
-    game_camera.last_y = w_dimension.height / 2.0f;
-    game_camera.fov = 45.0f;
-    game_camera.first_mouse = true;
-
     player_front = VEC3(0.0f, 0.0f, -1.0f);
     const char* w_title = "FirstGame";
 
@@ -473,10 +317,8 @@ s32 main(int argc, char* argv[])
 
     glfwMakeContextCurrent(window);
     glfwSetErrorCallback(glfw_error_callback);
-#if ALTERNATIVE_CAMERA
-    glfwSetCursorPosCallback(window, glfw_new_mouse_callback);
-#endif
     glfwSetScrollCallback(window, glfw_scroll_callback);
+    glfwSetCursorPosCallback(window, glfw_cursor_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 
@@ -703,11 +545,9 @@ s32 main(int argc, char* argv[])
         delta_time = _current_frame - last_frame;
         last_frame = _current_frame;
 		glfwPollEvents();
-#if ALTERNATIVE_CAMERA
-        glfw_new_process_input(window);
-#else
+
 		process_input(window);
-#endif
+
 #if FILE_DEBUGGING
 #if GLM_DEBUG
         FILE* profile_frame_file = fopen("profile_glm.log", "w+");
@@ -727,8 +567,8 @@ s32 main(int argc, char* argv[])
         glm_vec3_add(game_camera.pos, game_camera.front, sum);
         glm_lookat(game_camera.pos, sum, game_camera.up, view);
 #else
-        mat4f proj = perspective(rad(game_camera.fov), (f32)w_dimension.width / (f32)w_dimension.height, 0.1f, 100.0f);
-        mat4f view = lookat(game_camera.pos, vec3_add(game_camera.pos, game_camera.front), game_camera.up);
+        mat4f proj = perspective(rad(fov), (f32)w_dimension.width / (f32)w_dimension.height, 0.1f, 100.0f);
+        mat4f view = lookat(camera_position, camera_position + camera_front, camera_up);
 #endif
 #if FILE_DEBUGGING
         write_matrix(proj, profile_frame_file, "Projection matrix");

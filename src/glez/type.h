@@ -8,10 +8,12 @@
 #else
 #define GAME_DEBUG
 #endif
-#define FAST_AND_ERROR_PRONE 0
 
 /*** TYPES ***/
 
+typedef _Bool bool;
+#define true 1
+#define false 0
 #include <stdint.h>
 typedef uint8_t  u8;
 typedef uint16_t u16;
@@ -34,4 +36,16 @@ typedef double f64;
 #define INTRINSIC_INLINE __inline__
 #define ALIGNED(bytes) __declspec(align(bytes))
 
-#define my_offsetof(t, d)  __builtin_offsetof(t, d)
+typedef f32 ALIGNED(16) vec4f VECTOR_TYPE(4);
+typedef vec4f quat;
+typedef union
+{
+    vec4f row[4];
+    struct
+    {
+        vec4f r0, r1, r2, r3;
+    };
+} mat4f;
+typedef vec4f vec3f;
+#define VEC3(x, y, z) (vec3f) { x, y, z, 0.0f }
+typedef f32 vec3f_shader[3];

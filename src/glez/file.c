@@ -1,19 +1,24 @@
-#include "type.h"
+#include <glez/type.h>
 #include <stdio.h>
 #include <assert.h>
 #if _WIN32
+#include <Windows.h>
 #elif __linux__
 #include <unistd.h>
 #endif
+#include <stb_sprintf.h>
 
-static char file_buffer[MEGABYTES(1024)];
+static char file_buffer[MEGABYTES(10)];
 static char* file_buffer_ptr = file_buffer;
 
 char* load_file(const char *name) {
 #ifdef GAME_DEBUG
     printf("[FILE] Reading file '%s'...\n", name);
+    //printf("[FILE] Reading file '%s'...\n", name);
     char cwd[1024];
 #if _WIN32
+    DWORD char_count = GetCurrentDirectoryA(1024, cwd);
+    assert(char_count);
 #elif __linux__
     getcwd(cwd, sizeof(cwd));
 #endif

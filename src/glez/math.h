@@ -4,21 +4,8 @@
 #include <math.h>
 #include <assert.h>
 #include <immintrin.h>
-#include <stb_sprintf.h>
 #define SIMD 1
 
-typedef f32 __declspec(align(16)) vec4f __attribute__((ext_vector_type(4)));
-typedef union
-{
-    vec4f row[4];
-    struct
-    {
-        vec4f r0, r1, r2, r3;
-    };
-} mat4f;
-typedef vec4f vec3f;
-#define VEC3(x, y, z) (vec3f) { x, y, z, 0.0f }
-typedef f32 vec3f_shader[3];
 #define PI_F32 3.14159265358979323846264338327950288
 
 #define MAT4_ZERO_INIT          {.r0 = (vec4f){0.0f, 0.0f, 0.0f, 0.0f},                    \
@@ -41,6 +28,18 @@ typedef f32 vec3f_shader[3];
 /* for C only */
 #define MAT4_IDENTITY ((mat4f)MAT4_IDENTITY_INIT)
 #define MAT4_ZERO     ((mat4f)MAT4_ZERO_INIT)
+
+static inline vec3f vec3_closer(vec3f a, vec3f b)
+{
+#if SIMD
+//#pragma error
+    return (vec3f){ 0, 0, 0, 0 };
+#else
+    f32 a_length_squared = (a.x * a.x) + (a.y * a.y) + (a.z * a.z);
+    f32 b_length_squared = (b.x * b.x) + (b.y * b.y) + (b.z * b.z);
+    return a_length_squared < b_length_squared ? b : a;
+#endif
+}
 
 static inline vec3f vec3_muladds(vec3f a, f32 s, vec3f dest)
 {
@@ -410,4 +409,57 @@ static inline mat4f rotate(mat4f m, f32 angle, vec3f axis)
 	mat4f rot = rotate_make(angle, axis);
 	m = mul_rot(m, rot);
     return m;
+}
+
+static inline vec4f dot_4wide(vec4f ax, vec4f ay, vec4f az, vec4f aw, vec4f bx, vec4f by, vec4f bz, vec4f bw)
+{
+    vec4f dx = _mm_mul_ps(ax, bx);
+    vec4f dy = _mm_mul_ps(ay, by);
+    vec4f dz = _mm_mul_ps(az, bz);
+    vec4f dw = _mm_mul_ps(aw, bw);
+
+    return _mm_add_ps(_mm_add_ps(dx, dy), _mm_add_ps(dz, dw));
+}
+
+// Refactor data
+static inline mat4f mat4f_mul(mat4f a, mat4f b)
+{
+#if SIMD
+    mat4f result;
+    for (s32 i = 0; i < 4; i++)
+    {
+		vec4f bx = _mm_set_ps(b.row[0][0], b.row[1][0], b.row[2][0], b.row[3][0]);
+		vec4f by = _mm_set_ps(b.row[0][1], b.row[1][1], b.row[2][1], b.row[3][1]);
+		vec4f bz = _mm_set_ps(b.row[0][2], b.row[1][2], b.row[2][2], b.row[3][2]);
+		vec4f bw = _mm_set_ps(b.row[0][3], b.row[1][3], b.row[2][3], b.row[3][3]);
+
+		vec4f dx = _mm_mul_ps(a.row[i], bx);
+		vec4f dy = _mm_mul_ps(a.row[i], by);
+		vec4f dz = _mm_mul_ps(a.row[i], bz);
+		vec4f dw = _mm_mul_ps(a.row[i], bw);
+
+		result.row[i] = _mm_add_ps(_mm_add_ps(dx, dy), _mm_add_ps(dz, dw));
+    }
+
+    return result;
+#else
+#pragma error
+    dest[0][0] = a00 * b00 + a10 * b01 + a20 * b02 + a30 * b03;
+    dest[0][1] = a01 * b00 + a11 * b01 + a21 * b02 + a31 * b03;
+    dest[0][2] = a02 * b00 + a12 * b01 + a22 * b02 + a32 * b03;
+    dest[0][3] = a03 * b00 + a13 * b01 + a23 * b02 + a33 * b03;
+    dest[1][0] = a00 * b10 + a10 * b11 + a20 * b12 + a30 * b13;
+    dest[1][1] = a01 * b10 + a11 * b11 + a21 * b12 + a31 * b13;
+    dest[1][2] = a02 * b10 + a12 * b11 + a22 * b12 + a32 * b13;
+    dest[1][3] = a03 * b10 + a13 * b11 + a23 * b12 + a33 * b13;
+    dest[2][0] = a00 * b20 + a10 * b21 + a20 * b22 + a30 * b23;
+    dest[2][1] = a01 * b20 + a11 * b21 + a21 * b22 + a31 * b23;
+    dest[2][2] = a02 * b20 + a12 * b21 + a22 * b22 + a32 * b23;
+    dest[2][3] = a03 * b20 + a13 * b21 + a23 * b22 + a33 * b23;
+    dest[3][0] = a00 * b30 + a10 * b31 + a20 * b32 + a30 * b33;
+    dest[3][1] = a01 * b30 + a11 * b31 + a21 * b32 + a31 * b33;
+    dest[3][2] = a02 * b30 + a12 * b31 + a22 * b32 + a32 * b33;
+    dest[3][3] = a03 * b30 + a13 * b31 + a23 * b32 + a33 * b33;
+#endif
+
 }

@@ -1,22 +1,15 @@
-#pragma once
-
-
-#include "type.h"
+#include <glez/type.h>
+#include <glez/model.h>
 #include <meshoptimizer.h>
-#define FAST_OBJ_IMPLEMENTATION
+#define FAST_OBJ_IMPLEMENTATION 1
 #include <fast_obj.h>
+#define STB_DS_IMPLEMENTATION
 #include <stb_ds.h>
 
-typedef struct
-{
-	f32 vx, vy, vz, pad[1];
-	u8 nx, ny, nz, pad2[1];
-	f32 tu, tv;
-} pos_norm_tex_vertex;
-
-void load(const char* path)
+mesh load_mesh(const char* path)
 {
 	fastObjMesh* obj = fast_obj_read(path);
+	assert(obj);
 
 	u64 index_count = 0;
 	u32 face_count = obj->face_count;
@@ -25,15 +18,16 @@ void load(const char* path)
 		index_count += 3 * (obj->face_vertices[i] - 2);
 	}
 
-	pos_norm_tex_vertex* vertices;
+	pos_norm_tex_vertex* vertices = NULL;
 	stbds_arrsetlen(vertices, index_count);
 
 	u64 vertex_offset = 0;
 	u64 index_offset = 0;
 
-	for (u32 i = 0; i < obj->face_count; i++)
+	for (u32 i = 0; i < face_count; i++)
 	{
-		for (u32 j = 0; j < obj->face_vertices[i]; j++)
+		u32 face_vertices = obj->face_vertices[i];
+		for (u32 j = 0; j < face_vertices; j++)
 		{
 			fastObjIndex gi = obj->indices[index_offset + j];
 
@@ -48,6 +42,7 @@ void load(const char* path)
 			v.vx = obj->positions[gi.p * 3 + 0];
 			v.vy = obj->positions[gi.p * 3 + 1];
 			v.vz = obj->positions[gi.p * 3 + 2];
+			v.pad[0] = 1.0f;
 
 			v.nx = (u8)(obj->normals[gi.n * 3 + 0] * 127.f + 127.5f);
 			v.ny = (u8)(obj->normals[gi.n * 3 + 1] * 127.f + 127.5f);
@@ -64,4 +59,22 @@ void load(const char* path)
 
 	assert(vertex_offset == index_count);
 	fast_obj_destroy(obj);
+
+	mesh m = { 0 };
+	u32* remap = NULL;
+	stbds_arrsetlen(remap, index_count);
+	u64 vertex_count = meshopt_generateVertexRemap(remap, NULL, index_count, vertices, index_count, sizeof(pos_norm_tex_vertex));
+
+	stbds_arrsetlen(m.vertices, vertex_count);
+	m.vertex_count = vertex_count;
+	stbds_arrsetlen(m.indices, index_count);
+	m.index_count = index_count;
+
+	meshopt_remapVertexBuffer(m.vertices, vertices, index_count, sizeof(pos_norm_tex_vertex), remap);
+	meshopt_remapIndexBuffer(m.indices, NULL, index_count, remap);
+	
+	stbds_arrfree(remap);
+	stbds_arrfree(vertices);
+
+	return m;
 }

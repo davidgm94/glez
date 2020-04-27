@@ -1,7 +1,29 @@
-#pragma once
-#include <glad/glad.h>
-typedef int s_opengl_handle;
-typedef unsigned u_opengl_handle;
+#include <glez/tex.h>
+#include <glez_gl/gl.h>
+#include <string.h>
+#include <glez/file.h>
+#include <stb_sprintf.h>
+#include <Windows.h>
+#include <stdio.h>
+
+u_opengl_handle gl_gen_texture(texture_info tex, bool transparency)
+{
+    GLenum format = transparency ? GL_RGBA : GL_RGB;
+    u_opengl_handle gl_texture_handle;
+    glGenTextures(1, &gl_texture_handle);
+    glBindTexture(GL_TEXTURE_2D, gl_texture_handle);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex.width, tex.height, 0, format, GL_UNSIGNED_BYTE, tex.data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    return gl_texture_handle;
+}
 
 s_opengl_handle compile_shader(const char* filename, GLenum shader_type)
 {
@@ -9,13 +31,14 @@ s_opengl_handle compile_shader(const char* filename, GLenum shader_type)
     strcat(shader_relative_path, filename);
     char* shader_content = load_file(shader_relative_path);
     s_opengl_handle shader = glCreateShader(shader_type);
-    glShaderSource(shader, 1, (const char *const *)&shader_content, NULL);
+    glShaderSource(shader, 1, (const char* const*)&shader_content, NULL);
     glCompileShader(shader);
     s32 success;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (success) {
         printf("Shader %s compiled successfully.\n", filename);
-    } else {
+    }
+    else {
         char info_log[512];
         glGetShaderInfoLog(shader, COUNT_OF(info_log), NULL, info_log);
         printf("Shader %s failed to compile:\n%s\n", filename, info_log);
@@ -37,7 +60,8 @@ s_opengl_handle create_program(s_opengl_handle vertex_shader, s_opengl_handle fr
     glDeleteShader(fragment_shader);
     if (success) {
         printf("Shader program linked successfully.\n");
-    } else {
+    }
+    else {
         char info_log[512];
         glGetProgramInfoLog(shader_program, COUNT_OF(info_log), NULL, info_log);
         printf("Shader program failed to be linked:\n%s\n", info_log);
@@ -46,14 +70,6 @@ s_opengl_handle create_program(s_opengl_handle vertex_shader, s_opengl_handle fr
 
     return shader_program;
 }
-
-typedef struct{
-    GLenum type;
-    u8 count;
-    u8 size;
-    u8 offset;
-    u8 padding[1];
-} uniform_metadata;
 
 void fill_vertex_attributes(uniform_metadata* element_metadata_arr, u32 element_count, size_t type_size)
 {
@@ -67,35 +83,6 @@ void fill_vertex_attributes(uniform_metadata* element_metadata_arr, u32 element_
         offset += metadata_i.count * metadata_i.size;
     }
 }
-
-void shader_set_bool(s_opengl_handle shader_program, const char* name, bool value)
-{
-    glUniform1i(glGetUniformLocation(shader_program, name), (s32)value);
-}
-
-void shader_set_int(s_opengl_handle shader_program, const char* name, s32 value)
-{
-    glUniform1i(glGetUniformLocation(shader_program, name), value);
-}
-
-void shader_set_float(s_opengl_handle shader_program, const char* name, f32 value)
-{
-    glUniform1f(glGetUniformLocation(shader_program, name), value);
-}
-
-//void shader_set_mat4f(s_opengl_handle shader_program, const char* name, mat4f m)
-//{
-//    glUniformMatrix4fv(glGetUniformLocation(shader_program, name), 1, GL_FALSE, (const GLfloat*) &m);
-//}
 #if GLM_DEBUG
-void shader_set_mat4(s_opengl_handle shader_program, const char* name, mat4 m)
-{
-    glUniformMatrix4fv(glGetUniformLocation(shader_program, name), 1, GL_FALSE, (const GLfloat*)m);
-}
 #else
-void shader_set_mat4(s_opengl_handle shader_program, const char* name, mat4f m)
-{
-    glUniformMatrix4fv(glGetUniformLocation(shader_program, name), 1, GL_FALSE, (const GLfloat*)&m);
-}
 #endif
-

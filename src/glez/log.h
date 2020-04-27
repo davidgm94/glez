@@ -5,7 +5,7 @@
 #include <bits/types/struct_timespec.h>
 #endif
 #include <time.h>
-#include "type.h"
+#include <glez/type.h>
 
 #define GENERATE_ENUM(ENUM) ENUM,
 #define GENERATE_STRING(STRING) #STRING,
@@ -27,8 +27,13 @@ static const char* TIME_BLOCK_STRING[] =
 };
 
 typedef struct timing_record {
+#if _WIN32
+    s64 start;
+    s64 end;
+#else
     struct timespec start;
     struct timespec end;
+#endif
     f32 ms;
 } timing_record;
 
@@ -41,5 +46,11 @@ extern void frame_log_and_clear(void);
 
 extern frametime_record current_frame;
 
-//#define BEGIN_TIME_BLOCK(name) clock_gettime(CLOCK_MONOTONIC, &current_frame.record[name].start)
-//#define END_TIME_BLOCK(name) clock_gettime(CLOCK_MONOTONIC, &current_frame.record[name].end)
+#if _WIN32
+s64 __game_performance_freq;
+#define BEGIN_TIME_BLOCK(name) QueryPerformanceCounter((LARGE_INTEGER*)&current_frame.record[name].start)
+#define END_TIME_BLOCK(name) QueryPerformanceCounter((LARGE_INTEGER*)&current_frame.record[name].end)
+#else
+#define BEGIN_TIME_BLOCK(name) clock_gettime(CLOCK_MONOTONIC, &current_frame.record[name].start)
+#define END_TIME_BLOCK(name) clock_gettime(CLOCK_MONOTONIC, &current_frame.record[name].end)
+#endif

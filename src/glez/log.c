@@ -1,5 +1,5 @@
-#include "type.h"
-#include "log.h"
+#include <glez/type.h>
+#include <glez/log.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -7,9 +7,11 @@
 #define STB_SPRINTF_IMPLEMENTATION
 #include <stb_sprintf.h>
 #if _WIN32
+#include <Windows.h>
 #else
 #include <unistd.h>
 #endif
+
 
 frametime_record past_frame;
 frametime_record current_frame;
@@ -17,6 +19,12 @@ frametime_record current_frame;
 static char _g_print_string_buffer[PRINT_STRING_BUFFER_CHAR_COUNT];
 static char* _g_print_string_buffer_ptr = _g_print_string_buffer;
 
+#if _WIN32
+static inline double compute_ms(s64 start, s64 end)
+{
+    return (double)((end - start) * 1000) / __game_performance_freq;
+}
+#else
 static inline double compute_ms(struct timespec start, struct timespec end)
 {
     const u64 start_ns = (u64)start.tv_sec * (u64)10e9 + (u64)start.tv_nsec;
@@ -25,6 +33,7 @@ static inline double compute_ms(struct timespec start, struct timespec end)
     const double ns_to_ms_conversion_factor = 1000000;
     return ns / ns_to_ms_conversion_factor;
 }
+#endif
 
 static inline size_t dont_format(char* str)
 {
@@ -81,7 +90,11 @@ extern void frame_log_and_clear(void)
                  (current_frame.record[TIME_FRAME_GPU].ms / current_frame.record[TIME_FRAME_TOTAL].ms) * 100.0f);
     //struct timespec start, end, end2;
     //clock_gettime(CLOCK_MONOTONIC, &start);
+#if _WIN32
+    OutputDebugStringA(_g_print_string_buffer);
+#else
     fwrite(_g_print_string_buffer, _g_print_string_buffer_ptr - _g_print_string_buffer, 1, stdout);
+#endif
     //clock_gettime(CLOCK_MONOTONIC, &end);
     //write(1, _g_print_string_buffer, _g_print_string_buffer_ptr - _g_print_string_buffer);
     //clock_gettime(CLOCK_MONOTONIC, &end2);

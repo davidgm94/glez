@@ -48,4 +48,5 @@ typedef union
 } mat4f;
 typedef vec4f vec3f;
 #define VEC3(x, y, z) (vec3f) { x, y, z, 0.0f }
+#define PURE_QUAT(x, y, z) VEC3(x, y, z)
 typedef f32 vec3f_shader[3];

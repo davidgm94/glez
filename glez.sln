@@ -4,10 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glez_gl", "glez_gl.vcxproj", "{88DB529B-885A-42A6-B48A-117A5C1238CF}"
-	ProjectSection(ProjectDependencies) = postProject
-		{01285C45-DA05-484B-854A-2C42CF67C07F} = {01285C45-DA05-484B-854A-2C42CF67C07F}
-		{FAC6A5B9-D619-4D8D-9674-93F10DC793DD} = {FAC6A5B9-D619-4D8D-9674-93F10DC793DD}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "meshoptimizer", "src\ext\meshoptimizer\meshoptimizer.vcxproj", "{01285C45-DA05-484B-854A-2C42CF67C07F}"
 	ProjectSection(ProjectDependencies) = postProject

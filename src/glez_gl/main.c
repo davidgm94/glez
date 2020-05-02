@@ -3,7 +3,7 @@
 #define FILE_DEBUGGING 0
 #define DOUBLE_BUFFER 1
 #define FASTER_SHADER_MATH 0
-#define ALTERNATIVE_CAMERA 1
+#define ALTERNATIVE_CAMERA 0
 
 #if GLM_DEBUG
 #include <cglm/cglm.h>
@@ -70,6 +70,8 @@ f32 player_x = 0.0f;
 f32 player_y = 0.0f;
 f32 player_z = 0.0f;
 
+f32 player_rot_angle = 0.0f;
+
 vec3f player_front = { 0 };
 
 f32 floor_x = 0.0f;
@@ -85,10 +87,29 @@ typedef struct {
     f32 last_x, last_y;
 } game_camera;
 
-f32 fov;
-bool first_mouse = true;
-game_camera camera;
+typedef struct quat_camera {
+    quat rotation;
+    vec3f position;
+    f32 scale;
+} quat_camera;
 
+f32 fov = 45.0f;
+bool first_mouse = true;
+#if ALTERNATIVE_CAMERA
+quat_camera camera;
+#else
+game_camera camera;
+#endif
+game_camera mario;
+
+#if ALTERNATIVE_CAMERA
+void init_camera(quat_camera* camera)
+{
+    camera->rotation = ? ? ? ? ;
+    camera->position = VEC3(0.0f, 0.0f, 3.0f);
+    camera->scale = ? ? ? ? ;
+}
+#else
 void init_camera(game_camera* camera)
 {
 	camera->position = VEC3(0.0f, 0.0f, 3.0f);
@@ -99,14 +120,57 @@ void init_camera(game_camera* camera)
 	camera->pitch = 0.0f;
 	camera->last_x = 1024 / 2.0f;
 	camera->last_y = 576 / 2.0f;
-	fov = 45.0f;
+}
+#endif
+
+vec3f rotate_vector_quat(vec3f vector, quat q)
+{
+    vec3f result =
+        (2.0f * vec3_dot(q, vector) * q) +
+        ((q.w * q.w - vec3_dot(q, q)) * vector) +
+        (2.0f * q.w * vec3_cross(q, vector));
+
+    return result;
+}
+mat4f mat4_transpose(mat4f A)
+{
+    mat4f result;
+    for (u32 i = 0; i < 4; i++)
+    {
+        for (u32 j = 0; j < 4; j++)
+        {
+            result.row[i][j] = A.row[j][i];
+        }
+    }
+    return result;
 }
 
-//typedef struct quat_camera {
-//    quat rotation;
-//    vec3f position;
-//    f32 scale;
-//} quat_camera;
+mat4f lookat_quat(quat rotation, vec3f position)
+{
+    mat4f view = { 0 };
+    // TODO: this rotation multiplication must take into account the quat-specific math
+    vec3f v1 = vec3_normalize(rotation * VEC3(0.0f, 0.0f, 1.0f));
+    vec3f v2 = vec3_cross(vec3_normalize(rotation * VEC3(0.0f, 1.0f, 0.0f)), v1);
+    vec3f v3 = vec3_cross(v1, v2);
+    
+    view.row[0][0] = v2.x;
+    view.row[0][1] = v3.x;
+    view.row[0][2] = v1.x;
+
+    view.row[1][0] = v2.y;
+    view.row[1][1] = v3.y;
+    view.row[1][2] = v1.y;
+
+    view.row[2][0] = v2.z;
+    view.row[2][1] = v3.z;
+    view.row[2][2] = v1.z;
+
+    view.row[3][0] = vec3_dot(-v2, position);
+    view.row[3][1] = vec3_dot(-v3, position);
+    view.row[3][2] = vec3_dot(-v1, position);
+
+    return mat4_transpose(view);
+}
 
 void rest_of_the_game_input(GLFWwindow* window)
 {
@@ -117,12 +181,10 @@ void rest_of_the_game_input(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
         player_z += mario_speed;
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        player_x -= mario_speed;
-        player_front.z -= experimental_speed;
+        player_rot_angle -= 1.0f;
     }
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        player_x += mario_speed;
-        player_front.z += experimental_speed;
+        player_rot_angle += 1.0f;
     }
 
     if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS)
@@ -650,11 +712,10 @@ s32 main(int argc, char* argv[])
 #else
         mat4f mario_model = MAT4_IDENTITY;
         scale_v = VEC3(0.05f, 0.05f, 0.05f);
-        float angle = player_x;
-        f32 mario_angle = rad(angle);
-        mario_model = rotate(mario_model, mario_angle, 5.0f * VEC3(0.0f, 1.0f, 0.0f));
+        f32 mario_angle = rad(player_rot_angle);
         mario_model = scale(mario_model, scale_v);
-        mario_model = translate(mario_model, (vec3f) { 0.0f, player_y, player_z });
+        mario_model = translate(mario_model, (vec3f) { player_x, player_y, player_z });
+        mario_model = rotate(mario_model, mario_angle, 5.0f * VEC3(0.0f, 1.0f, 0.0f));
 #endif
 #endif
 

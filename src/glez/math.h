@@ -28,6 +28,7 @@
 /* for C only */
 #define MAT4_IDENTITY ((mat4f)MAT4_IDENTITY_INIT)
 #define MAT4_ZERO     ((mat4f)MAT4_ZERO_INIT)
+#define VEC3_RIGHT VEC3(1.0f, 0.0f, 0.0f)
 
 static inline vec3f vec3_closer(vec3f a, vec3f b)
 {

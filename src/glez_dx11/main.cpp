@@ -7,11 +7,6 @@
 #include <DirectXColors.h>
 using namespace DirectX;
 
-#define WIDTH 1024
-#define HEIGHT 576
-
-s32 width = WIDTH;
-s32 height = HEIGHT;
 
 
 int main(void)

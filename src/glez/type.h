@@ -11,9 +11,11 @@
 
 /*** TYPES ***/
 
+#ifndef __cplusplus
 typedef _Bool bool;
 #define true 1
 #define false 0
+#endif
 #include <stdint.h>
 typedef uint8_t  u8;
 typedef uint16_t u16;
@@ -36,6 +38,7 @@ typedef double f64;
 #define INTRINSIC_INLINE __inline__
 #define ALIGNED(bytes) __declspec(align(bytes))
 
+#ifndef __cplusplus
 typedef f32 ALIGNED(16) vec4f VECTOR_TYPE(4);
 typedef vec4f quat;
 typedef union
@@ -50,3 +53,6 @@ typedef vec4f vec3f;
 #define VEC3(x, y, z) (vec3f) { x, y, z, 0.0f }
 #define PURE_QUAT(x, y, z) VEC3(x, y, z)
 typedef f32 vec3f_shader[3];
+#endif
+#define WIN32_CHECK(_hr) do { s32 hr = (s32)(_hr); if (hr < 0) { printf("D3D FAIL! CODE: %d\n", hr); assert(0); } } while(0)
+#define UUID_MACRO(_type, _obj) (__uuidof(_type)), ((void**)(&_obj))

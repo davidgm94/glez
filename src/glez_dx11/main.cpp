@@ -1,4 +1,5 @@
 #include <glez/type.h>
+#include <glez/window.h>
 #include <stdio.h>
 #include <assert.h>
 #include <d3d11_4.h>
@@ -9,12 +10,12 @@ using namespace DirectX;
 
 
 
-int main(void)
+s32 main(void)
 {
 	s32 glfw_init = glfwInit();
 	assert(glfw_init);
 
-	GLFWwindow* window = glfwCreateWindow(width, height, "GLEZ DirectX 11", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(window_dimension.width, window_dimension.height, "GLEZ DirectX 11", NULL, NULL);
 
 	D3D_DRIVER_TYPE driver_type = D3D_DRIVER_TYPE_HARDWARE;
 	D3D_FEATURE_LEVEL feature_levels[] =
@@ -49,8 +50,8 @@ int main(void)
 	if (dxgi_factory)
 	{
 		DXGI_SWAP_CHAIN_DESC1 sd = {};
-		sd.Width = width;
-		sd.Height = height;
+		sd.Width = window_dimension.width;
+		sd.Height = window_dimension.height;
 		sd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		sd.SampleDesc.Count = 1;
 		sd.SampleDesc.Quality = 0;
@@ -64,8 +65,8 @@ int main(void)
 	{
 		DXGI_SWAP_CHAIN_DESC sd = {};
 		sd.BufferCount = 1;
-		sd.BufferDesc.Width = width;
-		sd.BufferDesc.Height = height;
+		sd.BufferDesc.Width = window_dimension.width;
+		sd.BufferDesc.Height = window_dimension.height;
 		sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		sd.BufferDesc.RefreshRate.Numerator = 60;
 		sd.BufferDesc.RefreshRate.Denominator = 1;
@@ -90,8 +91,8 @@ int main(void)
 	context->OMSetRenderTargets(1, &render_target_view, NULL);
 
 	D3D11_VIEWPORT viewport;
-	viewport.Width = (float)width;
-	viewport.Height = (float)height;
+	viewport.Width = (float)window_dimension.width;
+	viewport.Height = (float)window_dimension.height;
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
 	viewport.TopLeftX = 0;

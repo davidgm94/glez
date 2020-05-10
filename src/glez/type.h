@@ -56,9 +56,3 @@ typedef f32 vec3f_shader[3];
 #endif
 #define WIN32_CHECK(_hr) do { s32 hr = (s32)(_hr); if (hr < 0) { printf("D3D FAIL! CODE: %d\n", hr); assert(0); } } while(0)
 #define UUID_MACRO(_type, _obj) (__uuidof(_type)), ((void**)(&_obj))
-
-#define WIDTH 1024
-#define HEIGHT 576
-
-s32 width = WIDTH;
-s32 height = HEIGHT;

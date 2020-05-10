@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glez_gl", "glez_gl.vcxproj", "{88DB529B-885A-42A6-B48A-117A5C1238CF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8869A311-1BCC-4CFB-810B-5C9293B3815D} = {8869A311-1BCC-4CFB-810B-5C9293B3815D}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "meshoptimizer", "src\ext\meshoptimizer\meshoptimizer.vcxproj", "{01285C45-DA05-484B-854A-2C42CF67C07F}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -18,16 +21,25 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cglm", "src\ext\cglm\win\cg
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glez_vk", "glez_vk.vcxproj", "{DA0EDB7B-4947-4A0C-BF37-A3FEB7A9456D}"
 	ProjectSection(ProjectDependencies) = postProject
+		{8869A311-1BCC-4CFB-810B-5C9293B3815D} = {8869A311-1BCC-4CFB-810B-5C9293B3815D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glez_dx11", "glez_dx11.vcxproj", "{8FADEE92-03DF-4CD5-A5D6-B48F6D5CEF18}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8869A311-1BCC-4CFB-810B-5C9293B3815D} = {8869A311-1BCC-4CFB-810B-5C9293B3815D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glez_dx12", "glez_dx12.vcxproj", "{93F6F00C-B7E3-43D2-82E8-096D7E240C8C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8869A311-1BCC-4CFB-810B-5C9293B3815D} = {8869A311-1BCC-4CFB-810B-5C9293B3815D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glez_common", "glez_common.vcxproj", "{8869A311-1BCC-4CFB-810B-5C9293B3815D}"
+	ProjectSection(ProjectDependencies) = postProject
 		{01285C45-DA05-484B-854A-2C42CF67C07F} = {01285C45-DA05-484B-854A-2C42CF67C07F}
 		{FAC6A5B9-D619-4D8D-9674-93F10DC793DD} = {FAC6A5B9-D619-4D8D-9674-93F10DC793DD}
 		{CA8BCAF9-CD25-4133-8F62-3D1449B5D2FC} = {CA8BCAF9-CD25-4133-8F62-3D1449B5D2FC}
 	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glez_dx11", "glez_dx11.vcxproj", "{8FADEE92-03DF-4CD5-A5D6-B48F6D5CEF18}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glez_dx12", "glez_dx12.vcxproj", "{93F6F00C-B7E3-43D2-82E8-096D7E240C8C}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glez", "glez.vcxproj", "{8869A311-1BCC-4CFB-810B-5C9293B3815D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

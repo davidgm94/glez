@@ -1,4 +1,5 @@
 #include <glez/type.h>
+#include <glez/window.h>
 #include <d3d12.h>
 #include <d3dx12.h>
 #include <stdio.h>
@@ -31,7 +32,8 @@ IDXGIAdapter1* get_hardware_adapter(IDXGIFactory4* factory)
 s32 main(s32 argc, char* argv[])
 {
 	s32 glfw_init = glfwInit();
-	GLFWwindow* window = glfwCreateWindow(width, height, "GLEZ DirectX 12", NULL, NULL);
+	assert(glfw_init == GLFW_TRUE);
+	GLFWwindow* window = glfwCreateWindow(window_dimension.width, window_dimension.height, "GLEZ DirectX 12", NULL, NULL);
 	HWND native_window = glfwGetWin32Window(window);
 	u32 dxgi_factory_flags = 0;
 #ifdef GAME_DEBUG
@@ -58,8 +60,8 @@ s32 main(s32 argc, char* argv[])
 	const u32 frame_count = 2;
 	DXGI_SWAP_CHAIN_DESC1 swapchain_desc = {};
 	swapchain_desc.BufferCount = frame_count;
-	swapchain_desc.Width = width;
-	swapchain_desc.Height = height;
+	swapchain_desc.Width = window_dimension.width;
+	swapchain_desc.Height = window_dimension.height;
 	swapchain_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;

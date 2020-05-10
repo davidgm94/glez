@@ -1,11 +1,9 @@
-# FirstGame
+# GLEZ
 
-This game is developed for Linux
+An OpenGL-based renderer
+
 
 **TODO LIST**
 
 
-- [x] Fully functional frame-buffered frame_logger (using STDIO)
-- [x] Fully native clock timer
-- [ ] 
-- [ ] 
+- [ ] Fix glslang compilation in the Vulkan backend

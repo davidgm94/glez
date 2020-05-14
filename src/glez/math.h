@@ -1,6 +1,6 @@
 #pragma once
 
-#include "type.h"
+#include <glez/type.h>
 #include <math.h>
 #include <assert.h>
 #include <immintrin.h>

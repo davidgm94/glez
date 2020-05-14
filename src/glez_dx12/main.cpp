@@ -1,4 +1,4 @@
-#include <glez/type.h>
+#include <glez/math.h>
 #include <glez/window.h>
 #include <d3d12.h>
 #include <d3dx12.h>
@@ -31,6 +31,8 @@ IDXGIAdapter1* get_hardware_adapter(IDXGIFactory4* factory)
 
 s32 main(s32 argc, char* argv[])
 {
+	
+	vec3f a = VEC3_RIGHT;
 	s32 glfw_init = glfwInit();
 	assert(glfw_init == GLFW_TRUE);
 	GLFWwindow* window = glfwCreateWindow(window_dimension.width, window_dimension.height, "GLEZ DirectX 12", NULL, NULL);

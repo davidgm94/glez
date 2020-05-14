@@ -14,6 +14,7 @@
 #include <glez/sys.h>
 #include <glez/file.h>
 #include <glez/tex.h>
+#include <glez/window.h>
 #include <glez_gl/gl.h>
 #include <GLFW/glfw3.h>
 #include <glez/model.h>
@@ -28,9 +29,7 @@
 #endif
 #include <stb_sprintf.h>
 
-typedef struct {
-    u32 width, height;
-} window_dimension;
+
 
 typedef struct {
     f32 position[3];
@@ -46,16 +45,11 @@ typedef struct {
     f32 tex_coord[2];
 } pos_tex_vertex;
 
-window_dimension w_dimension = {
-        .width = 1024,
-        .height = 576,
-};
-
 void framebuffer_size_callback(GLFWwindow* window, s32 width, s32 height)
 {
     glViewport(0, 0, width, height);
-    w_dimension.width = width;
-    w_dimension.width = height;
+    window_dimension.width = width;
+    window_dimension.height = height;
 }
 
 void glfw_error_callback(s32 error, const char* desc)
@@ -66,13 +60,83 @@ void glfw_error_callback(s32 error, const char* desc)
 f32 delta_time = 0.0f;
 f32 last_frame = 0.0f;
 
+typedef struct {
+    f32 posx, posy, posz;
+    f32 rotx, roty, rotz;
+    f32 scale;
+} entity;
+
+void entity_increase_position(entity* e, float dx, float dy, float dz)
+{
+    e->posx += dx;
+    e->posy += dy;
+    e->posz += dz;
+}
+
+void entity_increase_rotation(entity* e, float dx, float dy, float dz)
+{
+    e->rotx += dx;
+    e->roty += dy;
+    e->rotz += dz;
+}
+
+const f32 run_speed = 20;
+const f32 turn_speed = 160;
+typedef struct player {
+    entity e;
+    f32 current_speed;
+    f32 current_turn_speed;
+
+} player;
+
+player mario = { 0 };
+
+mat4f create_transformation_matrix(vec3f translation, f32 rx, f32 ry, f32 rz, f32 s)
+{
+    mat4f T = MAT4_IDENTITY;
+    T = translate(T, translation);
+    T = rotate(T, rad(rx), VEC3(1.0f, 0.0f, 0.0f));
+    T = rotate(T, rad(ry), VEC3(0.0f, 1.0f, 0.0f));
+    T = rotate(T, rad(rz), VEC3(0.0f, 0.0f, 1.0f));
+    // scale???
+    T.r0 *= s;
+    T.r1 *= s;
+    T.r2 *= s;
+    // T.r3 *= s;
+
+    return T;
+}
+
+void init_player(player* p)
+{
+    p->e.posx = 0.0f;
+    p->e.posy = 0.0f;
+    p->e.posz = 0.0f;
+    p->e.rotx = 0.0f;
+    p->e.roty = 0.0f;
+    p->e.rotz = 0.0f;
+    p->e.scale = 0.05f;
+}
+
+void move_entity(entity* e, f32 current_turn_speed, f32 current_speed)
+{
+    entity_increase_rotation(e, 0.0f, current_turn_speed * delta_time, 0.0f);
+    f32 distance = current_speed * delta_time;
+    f32 dx = distance * sinf(rad(e->roty));
+    f32 dz = distance * cosf(rad(e->roty));
+    entity_increase_position(e, dx, 0.0f, dz);
+}
+
+
 f32 player_x = 0.0f;
 f32 player_y = 0.0f;
 f32 player_z = 0.0f;
 
-f32 player_rot_angle = 0.0f;
+f32 mario_front_x = 0.0f;
+f32 mario_front_y = 1.0f;
+f32 mario_front_z = 0.0f;
 
-vec3f player_front = { 0 };
+f32 player_rot_angle = 0.0f;
 
 f32 floor_x = 0.0f;
 f32 floor_y = 0.0f;
@@ -100,7 +164,6 @@ quat_camera camera;
 #else
 game_camera camera;
 #endif
-game_camera mario;
 
 #if ALTERNATIVE_CAMERA
 void init_camera(quat_camera* camera)
@@ -174,18 +237,54 @@ mat4f lookat_quat(quat rotation, vec3f position)
 
 void rest_of_the_game_input(GLFWwindow* window)
 {
-    f32 mario_speed = 250.0f * delta_time;
-    f32 experimental_speed = 250.0f * delta_time;
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    const f32 mario_speed = 250.0f * delta_time;
+#define DEVELOP 1
+    
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+#if DEVELOP
+        mario.current_speed = run_speed;
+        //player_x += mario_front_x * mario_speed;
+        //player_y += mario_front_y * mario_speed;
+        //player_z += mario_front_z * mario_speed;
+#else
         player_z -= mario_speed;
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+#endif
+    } else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+#if DEVELOP
+        mario.current_speed = -run_speed;
+        //player_x -= mario_front_x * mario_speed;
+        //player_y -= mario_front_y * mario_speed;
+        //player_z -= mario_front_z * mario_speed;
+#else
         player_z += mario_speed;
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        player_rot_angle -= 1.0f;
+#endif
     }
+    else
+    {
+        mario.current_speed = 0.0f;
+    }
+
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+#if DEVELOP
+        mario.current_turn_speed = -turn_speed;
+        //player_rot_angle += 1.0f;
+#else
         player_rot_angle += 1.0f;
+#endif
     }
+    else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+#if DEVELOP
+        mario.current_turn_speed = turn_speed;
+            //player_rot_angle -= 1.0f;
+#else
+        player_rot_angle -= 1.0f;
+#endif
+    }
+    else
+    {
+        mario.current_turn_speed = 0.0f;
+    }
+
 
     if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS)
         floor_y += mario_speed;
@@ -347,16 +446,12 @@ typedef struct {
     f32 scale;
 } game_object_3d;
 
-#if _WIN32
-s32 WINAPI WinMain(HINSTANCE instance, HINSTANCE previous_instance, LPSTR lpcmdline, s32 ncmdshow)
-#elif __linux__
 s32 main(int argc, char* argv[])
-#endif
 {
     init_camera(&camera);
+    init_player(&mario);
     QueryPerformanceFrequency((LARGE_INTEGER*)&__game_performance_freq);
     mesh m = load_mesh("assets/mario/mario.obj");
-    player_front = VEC3(0.0f, 0.0f, -1.0f);
     const char* w_title = "FirstGame";
 
     s32 glfw_init = glfwInit();
@@ -370,7 +465,7 @@ s32 main(int argc, char* argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(w_dimension.width, w_dimension.height, w_title, NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(window_dimension.width, window_dimension.height, w_title, NULL, NULL);
     if (!window) {
         const char window_err_msg[] = "GLFW window couldn't be created\n";
         LOG_ERROR_AND_EXIT(window_err_msg);
@@ -623,12 +718,12 @@ s32 main(int argc, char* argv[])
 
 #if GLM_DEBUG
         mat4 proj, view;
-        glm_perspective(rad(game_camera.fov), (f32)w_dimension.width / (f32)w_dimension.height, 0.1f, 100.0f, proj);
+        glm_perspective(rad(game_camera.fov), (f32)window_dimension.width / (f32)window_dimension.height, 0.1f, 100.0f, proj);
         vec3 sum;
         glm_vec3_add(game_camera.pos, game_camera.front, sum);
         glm_lookat(game_camera.pos, sum, game_camera.up, view);
 #else
-        mat4f proj = perspective(rad(fov), (f32)w_dimension.width / (f32)w_dimension.height, 0.1f, 100.0f);
+        mat4f proj = perspective(rad(fov), (f32)window_dimension.width / (f32)window_dimension.height, 0.1f, 100.0f);
         mat4f view = lookat(camera.position, camera.position + camera.front, camera.up);
 #endif
 #if FILE_DEBUGGING
@@ -710,12 +805,14 @@ s32 main(int argc, char* argv[])
 #if FASTER_SHADER_MATH
         f32 scale = 0.05f;
 #else
-        mat4f mario_model = MAT4_IDENTITY;
-        scale_v = VEC3(0.05f, 0.05f, 0.05f);
-        f32 mario_angle = rad(player_rot_angle);
-        mario_model = scale(mario_model, scale_v);
-        mario_model = translate(mario_model, (vec3f) { player_x, player_y, player_z });
-        mario_model = rotate(mario_model, mario_angle, 5.0f * VEC3(0.0f, 1.0f, 0.0f));
+        move_entity(&mario.e, mario.current_turn_speed, mario.current_speed);
+        mat4f mario_model = create_transformation_matrix(VEC3(mario.e.posx, mario.e.posy, mario.e.posz), mario.e.rotx, mario.e.roty, mario.e.rotz, mario.e.scale);
+        //mat4f mario_model = MAT4_IDENTITY;
+        //scale_v = VEC3(0.05f, 0.05f, 0.05f);
+        //f32 mario_angle = rad(player_rot_angle);
+        //mario_model = scale(mario_model, scale_v);
+        //mario_model = translate(mario_model, VEC3(player_x, player_y, player_z));
+        //mario_model = rotate(mario_model, mario_angle, VEC3(mario_front_x, mario_front_y, mario_front_z));
 #endif
 #endif
 

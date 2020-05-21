@@ -97,11 +97,10 @@ mat4f create_transformation_matrix(vec3f translation, f32 rx, f32 ry, f32 rz, f3
     T = rotate(T, rad(rx), VEC3(1.0f, 0.0f, 0.0f));
     T = rotate(T, rad(ry), VEC3(0.0f, 1.0f, 0.0f));
     T = rotate(T, rad(rz), VEC3(0.0f, 0.0f, 1.0f));
-    // scale???
+    // T = scale();
     T.r0 *= s;
     T.r1 *= s;
     T.r2 *= s;
-    // T.r3 *= s;
 
     return T;
 }
@@ -234,71 +233,32 @@ mat4f lookat_quat(quat rotation, vec3f position)
     return mat4_transpose(view);
 }
 
-void rest_of_the_game_input(GLFWwindow* window)
+void update_player_input(GLFWwindow* window)
 {
-    const f32 mario_speed = 250.0f * delta_time;
-#define DEVELOP 1
-    
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-#if DEVELOP
+    bool up = glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS;
+    bool down = glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS;
+    bool right = glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS;
+    bool left = glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS;
+
+    if (up) {
         mario.current_speed = run_speed;
-        //player_x += mario_front_x * mario_speed;
-        //player_y += mario_front_y * mario_speed;
-        //player_z += mario_front_z * mario_speed;
-#else
-        player_z -= mario_speed;
-#endif
-    } else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-#if DEVELOP
+    } else if (down) {
         mario.current_speed = -run_speed;
-        //player_x -= mario_front_x * mario_speed;
-        //player_y -= mario_front_y * mario_speed;
-        //player_z -= mario_front_z * mario_speed;
-#else
-        player_z += mario_speed;
-#endif
-    }
-    else
-    {
+    } if (!(up || down)) {
         mario.current_speed = 0.0f;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-#if DEVELOP
+    if (right) {
         mario.current_turn_speed = -turn_speed;
-        //player_rot_angle += 1.0f;
-#else
-        player_rot_angle += 1.0f;
-#endif
-    }
-    else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-#if DEVELOP
+    } else if (left) {
         mario.current_turn_speed = turn_speed;
-            //player_rot_angle -= 1.0f;
-#else
-        player_rot_angle -= 1.0f;
-#endif
-    }
-    else
-    {
+    } if (!(right || left)) {
         mario.current_turn_speed = 0.0f;
     }
-
-
-    if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS)
-        floor_y += mario_speed;
-    if (glfwGetKey(window, GLFW_KEY_KP_2) == GLFW_PRESS)
-        floor_y -= mario_speed;
-    if (glfwGetKey(window, GLFW_KEY_KP_4) == GLFW_PRESS)
-        floor_x -= mario_speed;
-    if (glfwGetKey(window, GLFW_KEY_KP_6) == GLFW_PRESS)
-        floor_x += mario_speed;
 }
 
-void process_input(GLFWwindow *window)
+void update_camera_input(GLFWwindow* window)
 {
-    glfwSetWindowShouldClose(window, glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS);
-
     f32 camera_speed = 2.5f * delta_time;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         camera.position += camera_speed * camera.front;
@@ -312,8 +272,14 @@ void process_input(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         camera.position += vec3_normalize(vec3_cross(camera.front, camera.up)) * camera_speed;
     }
+}
 
-    rest_of_the_game_input(window);
+void process_input(GLFWwindow *window)
+{
+    glfwSetWindowShouldClose(window, glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS);
+
+    update_camera_input(window);
+    update_player_input(window);
 }
 
 void glfw_scroll_callback(GLFWwindow* window, f64 x_offset, f64 y_offset)
@@ -363,9 +329,9 @@ void quick_debug(const char* format, ...)
 {
     va_list va;
     va_start(va, format);
-    stbsp_vsprintf(buffer, format, va);
+    s32 bytes = stbsp_vsprintf(buffer, format, va);
     va_end(va);
-    OutputDebugStringA(buffer);
+    fwrite(buffer, bytes, 1, stdout);
 }
 
 void add_to_file_profiling(FILE* file, const char* fmt, ...)
@@ -373,7 +339,7 @@ void add_to_file_profiling(FILE* file, const char* fmt, ...)
     char buffer[4096];
     va_list va;
     va_start(va, fmt);
-    int len = stbsp_vsprintf(buffer, fmt, va);
+    s32 len = stbsp_vsprintf(buffer, fmt, va);
     va_end(va);
     fwrite(buffer, len, 1, file);
 }
@@ -385,11 +351,11 @@ void write_matrix(mat4f m, FILE* file, const char* matrix_name)
 #endif
 {
     char buffer[2048];
-    int byte_ptr = stbsp_sprintf(buffer, "Matrix %s\n[\n", matrix_name);
-    for (int i = 0; i < 4; i++)
+    s32 byte_ptr = stbsp_sprintf(buffer, "Matrix %s\n[\n", matrix_name);
+    for (s32 i = 0; i < 4; i++)
     {
         byte_ptr += stbsp_sprintf(buffer + byte_ptr, "\t{");
-        for (int j = 0; j < 4; j++)
+        for (s32 j = 0; j < 4; j++)
         {
 #if GLM_DEBUG
             f32 n = m[i][j];
@@ -420,11 +386,11 @@ mat4f get_rand_mat4f(void)
 void write_matrix_debug(mat4f m, const char* matrix_name)
 {
     char buffer[2048];
-    int byte_ptr = stbsp_sprintf(buffer, "Matrix %s\n[\n", matrix_name);
-    for (int i = 0; i < 4; i++)
+    s32 byte_ptr = stbsp_sprintf(buffer, "Matrix %s\n[\n", matrix_name);
+    for (s32 i = 0; i < 4; i++)
     {
         byte_ptr += stbsp_sprintf(buffer + byte_ptr, "\t{");
-        for (int j = 0; j < 4; j++)
+        for (s32 j = 0; j < 4; j++)
         {
 #if GLM_DEBUG
             f32 n = m[i][j];
@@ -445,7 +411,7 @@ typedef struct {
     f32 scale;
 } game_object_3d;
 
-s32 main(int argc, char* argv[])
+s32 main(s32 argc, char* argv[])
 {
     init_camera(&camera);
     init_player(&mario);

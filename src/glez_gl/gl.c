@@ -1,10 +1,10 @@
-#include <glez/tex.h>
 #include <glez_gl/gl.h>
 #include <string.h>
-#include <glez/file.h>
 #include <stb_sprintf.h>
 #include <Windows.h>
 #include <stdio.h>
+#include <glez/file.h>
+#include <glez/tex.h>
 
 u_opengl_handle gl_gen_texture(texture_info tex, bool transparency)
 {

@@ -87,7 +87,7 @@ typedef struct player {
 
 } player;
 
-player mario = { 0 };
+player mario = {};
 
 mat4f create_transformation_matrix(vec3f translation, f32 rx, f32 ry, f32 rz, f32 s)
 {
@@ -207,7 +207,7 @@ mat4f mat4_transpose(mat4f A)
 
 mat4f lookat_quat(quat rotation, vec3f position)
 {
-    mat4f view = { 0 };
+    mat4f view = {};
     // TODO: this rotation multiplication must take into account the quat-specific math
     vec3f v1 = vec3_normalize(rotation * VEC3(0.0f, 0.0f, 1.0f));
     vec3f v2 = vec3_cross(vec3_normalize(rotation * VEC3(0.0f, 1.0f, 0.0f)), v1);
@@ -535,27 +535,27 @@ s32 main(s32 argc, char* argv[])
 #endif
 
     pos_tex_vertex floor_vertices[6] = {
-            [0] = {
-                    .position = { 1.0f, 0.0f, 1.0f, },
-                    .tex_coord = { 1.0f, 1.0f, },
+            {
+                    { 1.0f, 0.0f, 1.0f, },
+                    { 1.0f, 1.0f, },
             },
-            [1] = {
+            {
                     .position = { -1.0f, 0.0f, 1.0f, },
                     .tex_coord = { 0.0f, 1.0f, },
             },
-            [2] = {
+            {
                     .position = { 1.0f, 0.0f, -1.0f, },
                     .tex_coord = { 1.0f, 0.0f, },
             },
-            [3] = {
+            {
                     .position = { -1.0f, 0.0f, -1.0f, },
                     .tex_coord = { 0.0f, 0.0f, },
             },
-            [4] = {
+            {
                     .position = { -1.0f, 0.0f, 1.0f, },
                     .tex_coord = { 0.0f, 1.0f, },
             },
-            [5] = {
+            {
                     .position = { 1.0f, 0.0f, -1.0f, },
                     .tex_coord = { 1.0f, 0.0f, },
             },
@@ -569,12 +569,12 @@ s32 main(s32 argc, char* argv[])
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     uniform_metadata metadata[2] = {
-            [0] = {
+            {
                     .type = GL_FLOAT,
                     .count = 3,
                     .size = sizeof(f32),
             },
-            [1] = {
+            {
                      .type = GL_FLOAT,
                      .count = 2,
                      .size = sizeof(f32),
@@ -605,19 +605,16 @@ s32 main(s32 argc, char* argv[])
 
     uniform_metadata mario_metadata[3] =
     {
-        [0] =
         {
 			.type = GL_FLOAT,
 			.count = 4,
 			.size = sizeof(f32),
         },
-        [1] =
         {
 			.type = GL_UNSIGNED_BYTE,
 			.count = 4,
 			.size = sizeof(u8),
         },
-        [2] =
         {
             .type = GL_FLOAT,
             .count = 2,

@@ -35,7 +35,7 @@ static inline double compute_ms(struct timespec start, struct timespec end)
 }
 #endif
 
-static inline size_t dont_format(char* str)
+static inline size_t dont_format(const char* str)
 {
     size_t len = strlen(str);
     for (u64 i = 0; i < len; i++)
@@ -49,7 +49,7 @@ static inline size_t dont_format(char* str)
     return len;
 }
 
-extern void frame_logger(char* fmt, ...)
+extern void frame_logger(const char* fmt, ...)
 {
 #if LOGS
     size_t len = dont_format(fmt);

@@ -41,10 +41,16 @@ typedef struct frametime_record {
     struct timing_record record[TIME_FRAME_ELEMENT_COUNT];
 } frametime_record;
 
-extern void frame_logger(char* fmt, ...);
-extern void frame_log_and_clear(void);
+#ifdef __cplusplus
+extern "C" {
+#endif
+void frame_logger(const char* fmt, ...);
+void frame_log_and_clear(void);
+#ifdef __cplusplus
+}
+#endif
 
-extern frametime_record current_frame;
+frametime_record current_frame;
 
 #if _WIN32
 s64 __game_performance_freq;

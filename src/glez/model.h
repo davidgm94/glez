@@ -14,4 +14,10 @@ typedef struct
 	u32 vertex_count, index_count;
 } mesh;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 mesh load_mesh(const char* path);
+#ifdef __cplusplus
+}
+#endif

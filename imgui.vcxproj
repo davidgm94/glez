@@ -15,6 +15,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ext\imgui\c_imgui.cpp" />
     <ClCompile Include="src\ext\imgui\examples\imgui_impl_glfw.cpp" />
     <ClCompile Include="src\ext\imgui\examples\imgui_impl_opengl3.cpp" />
     <ClCompile Include="src\ext\imgui\examples\imgui_impl_win32.cpp" />
@@ -24,6 +25,7 @@
     <ClCompile Include="src\ext\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ext\imgui\c_imgui.h" />
     <ClInclude Include="src\ext\imgui\imconfig.h" />
     <ClInclude Include="src\ext\imgui\imgui.h" />
     <ClInclude Include="src\ext\imgui\imgui_internal.h" />
@@ -97,7 +99,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\glfw\include;$(SolutionDir)src\ext\imgui;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\ext\glfw\Include;$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\glfw\include;$(SolutionDir)src\ext\imgui;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -116,7 +118,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\glfw\include;$(SolutionDir)src\ext\imgui;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\ext\glfw\Include;$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\glfw\include;$(SolutionDir)src\ext\imgui;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -137,7 +139,7 @@
       <CompileAs>CompileAsCpp</CompileAs>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\glfw\include;$(SolutionDir)src\ext\imgui;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\ext\glfw\Include;$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\glfw\include;$(SolutionDir)src\ext\imgui;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

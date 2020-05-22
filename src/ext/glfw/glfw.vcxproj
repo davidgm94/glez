@@ -133,7 +133,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)win32lib\</OutDir>
+    <OutDir>$(SolutionDir)build\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)\intermediate\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -146,11 +147,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)win32lib\</OutDir>
+    <OutDir>$(SolutionDir)build\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)\intermediate\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)win32lib\</OutDir>
+    <OutDir>$(SolutionDir)build\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)\intermediate\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -171,6 +174,9 @@
     <Lib>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
     </Lib>
+    <PreBuildEvent>
+      <Command>copy $(SolutionDir)lib\$(Configuration)\* $(SolutionDir)build\$(Configuration)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -242,6 +248,9 @@
     <Lib>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
     </Lib>
+    <PreBuildEvent>
+      <Command>copy $(SolutionDir)lib\$(Configuration)\* $(SolutionDir)build\$(Configuration)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">
     <ClCompile>
@@ -263,6 +272,9 @@
     <Lib>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
     </Lib>
+    <PreBuildEvent>
+      <Command>copy $(SolutionDir)lib\$(Configuration)\* $(SolutionDir)build\$(Configuration)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

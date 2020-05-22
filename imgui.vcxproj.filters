@@ -8,6 +8,7 @@
     <ClCompile Include="src\ext\imgui\examples\imgui_impl_opengl3.cpp" />
     <ClCompile Include="src\ext\imgui\examples\imgui_impl_win32.cpp" />
     <ClCompile Include="src\ext\imgui\examples\imgui_impl_glfw.cpp" />
+    <ClCompile Include="src\ext\imgui\c_imgui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ext\imgui\imgui.h" />
@@ -16,5 +17,6 @@
     <ClInclude Include="src\ext\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\ext\imgui\imstb_textedit.h" />
     <ClInclude Include="src\ext\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\ext\imgui\c_imgui.h" />
   </ItemGroup>
 </Project>

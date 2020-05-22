@@ -16,9 +16,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ext\cimgui\cimgui.cpp" />
+    <ClCompile Include="src\ext\cimgui\imgui\imgui.cpp" />
+    <ClCompile Include="src\ext\cimgui\imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\ext\cimgui\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\ext\cimgui\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ext\cimgui\cimgui.h" />
+    <ClInclude Include="src\ext\cimgui\imgui\imconfig.h" />
+    <ClInclude Include="src\ext\cimgui\imgui\imgui.h" />
+    <ClInclude Include="src\ext\cimgui\imgui\imgui_internal.h" />
+    <ClInclude Include="src\ext\cimgui\imgui\imstb_rectpack.h" />
+    <ClInclude Include="src\ext\cimgui\imgui\imstb_textedit.h" />
+    <ClInclude Include="src\ext\cimgui\imgui\imstb_truetype.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -64,24 +74,24 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)win32lib\</OutDir>
-    <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\intermediate\</IntDir>
+    <OutDir>$(SolutionDir)build\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)\intermediate\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)win32lib\</OutDir>
-    <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\intermediate\</IntDir>
+    <OutDir>$(SolutionDir)build\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)\intermediate\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)win32lib\</OutDir>
-    <IntDir>$(SolutionDir)build\$(ProjectName)\$(Configuration)\intermediate\</IntDir>
+    <OutDir>$(SolutionDir)build\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)\intermediate\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>CIMGUI_NO_EXPORT;CIMGUI_DEFINE_ENUMS_AND_STRUCTS;IMGUI_IMPL_API;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <CompileAs>Default</CompileAs>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -93,6 +103,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib</AdditionalLibraryDirectories>
     </Link>
+    <Lib>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -100,7 +113,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>CIMGUI_NO_EXPORT;CIMGUI_DEFINE_ENUMS_AND_STRUCTS;IMGUI_IMPL_API;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <CompileAs>Default</CompileAs>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -114,6 +127,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib</AdditionalLibraryDirectories>
     </Link>
+    <Lib>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">
     <ClCompile>
@@ -121,7 +137,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>CIMGUI_NO_EXPORT;CIMGUI_DEFINE_ENUMS_AND_STRUCTS;IMGUI_IMPL_API;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <CompileAs>Default</CompileAs>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -135,6 +151,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib</AdditionalLibraryDirectories>
     </Link>
+    <Lib>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+    </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

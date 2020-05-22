@@ -29,7 +29,6 @@
 #endif
 #include <stb_sprintf.h>
 
-
 typedef struct {
     f32 position[3];
     f32 color[3];

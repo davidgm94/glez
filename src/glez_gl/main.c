@@ -28,6 +28,7 @@
 #include <unistd.h>
 #endif
 #include <stb_sprintf.h>
+#include "mimgui.h"
 
 typedef struct {
     f32 position[3];
@@ -438,8 +439,8 @@ s32 main(s32 argc, char* argv[])
     glfwMakeContextCurrent(window);
     glfwSetErrorCallback(glfw_error_callback);
     glfwSetScrollCallback(window, glfw_scroll_callback);
-    glfwSetCursorPosCallback(window, glfw_cursor_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetCursorPosCallback(window, glfw_cursor_callback);
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 
     s32 glad_init = gladLoadGL();
@@ -653,6 +654,8 @@ s32 main(s32 argc, char* argv[])
     mat4f c = mat4f_mul(a, b);
     write_matrix_debug(c, "experiment");
     //_mm_insert_ps()
+    
+    IMGUI_init(OPENGL, GLFW, window);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -674,8 +677,11 @@ s32 main(s32 argc, char* argv[])
         add_to_file_profiling(profile_frame_file, "PROFILING FRAME:\n\n");
 #endif
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        IMGUI_OPENGL_GLFW_newFrame();
+        IMGUI_OPENGL_GLFW_recordFrame();
+        IMGUI_OPENGL_GLFW_renderFrame(window);
+        //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 #if GLM_DEBUG
         mat4 proj, view;

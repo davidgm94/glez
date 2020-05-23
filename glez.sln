@@ -45,6 +45,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glez", "glez.vcxproj", "{63
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "raygui", "raygui.vcxproj", "{B5CCEB19-3631-4F98-BA14-C30E56F99F75}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imgui", "imgui.vcxproj", "{5E35FD8D-FD84-4CD4-B87A-5DCF01AFC907}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -175,6 +177,15 @@ Global
 		{B5CCEB19-3631-4F98-BA14-C30E56F99F75}.ReleaseWithDebugInfo|x64.ActiveCfg = Debug|x64
 		{B5CCEB19-3631-4F98-BA14-C30E56F99F75}.ReleaseWithDebugInfo|x64.Build.0 = Debug|x64
 		{B5CCEB19-3631-4F98-BA14-C30E56F99F75}.ReleaseWithDebugInfo|x86.ActiveCfg = ReleaseWithDebugInfo|x64
+		{5E35FD8D-FD84-4CD4-B87A-5DCF01AFC907}.Debug|x64.ActiveCfg = Debug|x64
+		{5E35FD8D-FD84-4CD4-B87A-5DCF01AFC907}.Debug|x64.Build.0 = Debug|x64
+		{5E35FD8D-FD84-4CD4-B87A-5DCF01AFC907}.Debug|x86.ActiveCfg = Debug|x64
+		{5E35FD8D-FD84-4CD4-B87A-5DCF01AFC907}.Release|x64.ActiveCfg = Release|x64
+		{5E35FD8D-FD84-4CD4-B87A-5DCF01AFC907}.Release|x64.Build.0 = Release|x64
+		{5E35FD8D-FD84-4CD4-B87A-5DCF01AFC907}.Release|x86.ActiveCfg = Release|x64
+		{5E35FD8D-FD84-4CD4-B87A-5DCF01AFC907}.ReleaseWithDebugInfo|x64.ActiveCfg = ReleaseWithDebugInfo|x64
+		{5E35FD8D-FD84-4CD4-B87A-5DCF01AFC907}.ReleaseWithDebugInfo|x64.Build.0 = ReleaseWithDebugInfo|x64
+		{5E35FD8D-FD84-4CD4-B87A-5DCF01AFC907}.ReleaseWithDebugInfo|x86.ActiveCfg = ReleaseWithDebugInfo|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

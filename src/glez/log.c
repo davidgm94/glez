@@ -12,7 +12,6 @@
 #include <unistd.h>
 #endif
 
-
 frametime_record past_frame;
 frametime_record current_frame;
 #define PRINT_STRING_BUFFER_CHAR_COUNT (MEGABYTES(5))
@@ -49,6 +48,7 @@ static inline size_t dont_format(const char* str)
     return len;
 }
 
+// TODO: look for multiple ways to log information(stdout, OutputDebugString, file...)
 extern void frame_logger(const char* fmt, ...)
 {
 #if LOGS

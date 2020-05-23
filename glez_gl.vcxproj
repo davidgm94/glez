@@ -15,10 +15,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\glez_gl\mimgui.cpp" />
     <ClCompile Include="src\glez_gl\gl.c" />
     <ClCompile Include="src\glez_gl\main.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\glez_gl\mimgui.h" />
     <ClInclude Include="src\glez_gl\gl.h" />
   </ItemGroup>
   <ItemGroup>
@@ -100,7 +102,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)src\ext\cimgui;$(SolutionDir)src\ext\meshoptimizer\tools;$(SolutionDir)src\ext\meshoptimizer\src;$(SolutionDir)src\ext\cglm\include;$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\stb;$(SolutionDir)src\ext\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)src\ext\imgui;$(SolutionDir)src\ext\meshoptimizer\tools;$(SolutionDir)src\ext\meshoptimizer\src;$(SolutionDir)src\ext\cglm\include;$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\stb;$(SolutionDir)src\ext\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -108,7 +110,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalLibraryDirectories>$(SolutionDir)build\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>cimgui.lib;glez_common.lib;meshoptimizer.lib;glad.lib;glfw.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imgui.lib;glez_common.lib;meshoptimizer.lib;glad.lib;glfw.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -129,7 +131,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)src\ext\cimgui;$(SolutionDir)src\ext\meshoptimizer\tools;$(SolutionDir)src\ext\meshoptimizer\src;$(SolutionDir)src\ext\cglm\include;$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\stb;$(SolutionDir)src\ext\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)src\ext\imgui;$(SolutionDir)src\ext\meshoptimizer\tools;$(SolutionDir)src\ext\meshoptimizer\src;$(SolutionDir)src\ext\cglm\include;$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\stb;$(SolutionDir)src\ext\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -139,7 +141,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalLibraryDirectories>$(SolutionDir)build\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>cimgui.lib;glez_common.lib;meshoptimizer.lib;glad.lib;glfw.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imgui.lib;glez_common.lib;meshoptimizer.lib;glad.lib;glfw.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithDebugInfo|x64'">
@@ -160,7 +162,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)src\ext\cimgui;$(SolutionDir)src\ext\meshoptimizer\tools;$(SolutionDir)src\ext\meshoptimizer\src;$(SolutionDir)src\ext\cglm\include;$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\stb;$(SolutionDir)src\ext\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)src\ext\imgui;$(SolutionDir)src\ext\meshoptimizer\tools;$(SolutionDir)src\ext\meshoptimizer\src;$(SolutionDir)src\ext\cglm\include;$(SolutionDir)src\ext\glad\include;$(SolutionDir)src\ext\stb;$(SolutionDir)src\ext\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -170,7 +172,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalLibraryDirectories>$(SolutionDir)build\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>cimgui.lib;glez_common.lib;meshoptimizer.lib;glad.lib;glfw.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imgui.lib;glez_common.lib;meshoptimizer.lib;glad.lib;glfw.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

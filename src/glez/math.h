@@ -3,7 +3,7 @@
 #include <glez/type.h>
 #include <math.h>
 #include <assert.h>
-#include <immintrin.h>
+#include <intrin.h>
 #define SIMD 1
 
 #define PI_F32 3.14159265358979323846264338327950288
@@ -99,7 +99,7 @@ static inline f32 vec3_dot(vec3f a, vec3f b)
 {
 #if SIMD
     //int mask = (PICK_VEC4F_ELEM(false, true, true, true) << 4) | PICK_VEC4F_ELEM(false, true, true, true);
-    vec3f result = _mm_dp_ps(a, b, COMPUTE_3_ELEMS);
+    vec3f result = (vec3f)_mm_dp_ps(a, b, COMPUTE_3_ELEMS);
     return result[0];
 #else
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];

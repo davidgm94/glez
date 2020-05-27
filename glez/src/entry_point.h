@@ -1,9 +1,9 @@
 #pragma once
+#include "application.h"
 extern void createApplication(void);
 extern void deleteApplication(void);
-#include "application.h"
 
-int main(int argc, char* argv[])
+s32 main(s32 argc, char* argv[])
 {
 	createApplication();
 	run();

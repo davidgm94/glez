@@ -12,6 +12,9 @@
 
 /*** TYPES ***/
 
+#define STRUCT typedef struct
+#define ENUM typedef enum
+#define UNION typedef union
 #ifndef __cplusplus
 typedef _Bool bool;
 #define true 1
@@ -41,7 +44,7 @@ typedef double f64;
 
 typedef f32 ALIGNED(16) vec4f VECTOR_TYPE(4);
 typedef vec4f quat;
-typedef union
+UNION
 {
     vec4f row[4];
     struct
@@ -55,3 +58,6 @@ typedef vec4f vec3f;
 typedef f32 vec3f_shader[3];
 #define WIN32_CHECK(_hr) do { s32 hr = (s32)(_hr); if (hr < 0) { printf("D3D FAIL! CODE: %d\n", hr); assert(0); } } while(0)
 #define UUID_MACRO(_type, _obj) (__uuidof(_type)), ((void**)(&_obj))
+
+#define GENERATE_ENUM(ENUM) ENUM,
+#define GENERATE_STRING(STRING) #STRING,

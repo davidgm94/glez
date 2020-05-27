@@ -7,9 +7,12 @@
     <ClInclude Include="src\logger.h" />
     <ClInclude Include="src\entry_point.h" />
     <ClInclude Include="include\GLEZ\glez.h" />
+    <ClInclude Include="src\win32.h" />
+    <ClInclude Include="src\frame.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\application.c" />
     <ClCompile Include="src\logger.c" />
+    <ClCompile Include="src\frame.c" />
   </ItemGroup>
 </Project>

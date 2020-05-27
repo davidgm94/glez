@@ -11,14 +11,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\frame.h" />
     <ClInclude Include="src\entry_point.h" />
     <ClInclude Include="src\logger.h" />
     <ClInclude Include="src\application.h" />
     <ClInclude Include="src\core.h" />
     <ClInclude Include="include\GLEZ\glez.h" />
     <ClInclude Include="src\type.h" />
+    <ClInclude Include="src\win32.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\frame.c" />
     <ClCompile Include="src\logger.c" />
     <ClCompile Include="src\application.c" />
   </ItemGroup>
@@ -63,11 +66,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)build\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\$(Configuration)\intermediate\$(ProjectName)\</IntDir>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)build\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\$(Configuration)\intermediate\$(ProjectName)\</IntDir>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

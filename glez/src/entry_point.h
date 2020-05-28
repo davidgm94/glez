@@ -5,6 +5,7 @@ extern void deleteApplication(void);
 
 s32 main(s32 argc, char* argv[])
 {
+	platformInitialize();
 	createApplication();
 	run();
 	deleteApplication();

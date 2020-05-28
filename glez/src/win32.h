@@ -1,24 +1,37 @@
 #pragma once
 #include "type.h"
-#define VC_EXTRALEAN
-#define WIN32_LEAN_AND_MEAN 
-#include <Windows.h>
-
-s64 g_performanceFrecuency;
-f32 g_factorForMiliseconds;
+#include "lightwindows.h"
+s64 g_performanceFrequency;
 s64 g_startPerformanceCounter;
+#include "win32_internal.h"
 
-inline void initialize(void)
+void platformInitialize(void)
 {
-	QueryPerformanceFrequency((LARGE_INTEGER*)&g_performanceFrecuency);
-	g_factorForMiliseconds = g_performanceFrecuency * 1000.0f;
+	
+	logInfo("Initializing Windows");
+	g_Window.windowHandle = win32_createWindow(GetModuleHandle(NULL), win32_windowProcedure, 1024, 576, "WindowTitle", NULL);
+	
+	QueryPerformanceFrequency((LARGE_INTEGER*)&g_performanceFrequency);
+	g_timeFactor = g_performanceFrequency * 1000.0f;
+	printf("QueryPerformanceFrequency returned: %llu\n", (unsigned long long)g_performanceFrequency);
 }
 
-static inline f32 getTimeMS(void)
+void platformUpdate(void* windowHandle)
+{
+	HWND window = (HWND)windowHandle;
+	MSG msg = {0};
+	while (PeekMessageA(&msg, window, 0, 0, PM_REMOVE))
+	{
+		TranslateMessage(&msg);
+		DispatchMessageA(&msg);
+	}
+}
+
+f32 win32_getTimeMS(void)
 {
 	s64 performanceCounter;
 	QueryPerformanceCounter((LARGE_INTEGER*)&performanceCounter);
 	s64 differencePerformanceCounter = performanceCounter - g_startPerformanceCounter;
-	f64 ms = (f64)(differencePerformanceCounter * 1000) / (f64)g_performanceFrecuency;
+	f64 ms = (f64)(differencePerformanceCounter * 1000) / (f64)g_performanceFrequency;
 	return (f32)ms;
 }

@@ -19,7 +19,7 @@ typedef enum LOG_LEVEL {
 
 void logger(s32 level, const char* file, s32 line, const char* fmt, ...);
 char** getPointerToPrintBuffer(void);
-char* getPrintBuffer(void);
+const char* getPrintBuffer(void);
 #else
 #define logDebug(...) 
 #define logInfo(...)  

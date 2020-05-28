@@ -7,12 +7,15 @@
     <ClInclude Include="src\logger.h" />
     <ClInclude Include="src\entry_point.h" />
     <ClInclude Include="include\GLEZ\glez.h" />
-    <ClInclude Include="src\win32.h" />
     <ClInclude Include="src\frame.h" />
+    <ClInclude Include="src\win32.h" />
+    <ClInclude Include="src\lightwindows.h" />
+    <ClInclude Include="src\win32_internal.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\application.c" />
     <ClCompile Include="src\logger.c" />
     <ClCompile Include="src\frame.c" />
+    <ClCompile Include="src\win32_internal.c" />
   </ItemGroup>
 </Project>

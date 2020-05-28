@@ -1,19 +1,23 @@
 #include "frame.h"
-#include "win32.h"
+//#include "win32.c"
 #include "logger.h"
+#include "application.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include "lightwindows.h"
 
 FrameRecord i_currentFrame;
 FrameRecord i_pastFrame;
 
 static inline f32 computeMS(s64 start, s64 end)
 {
-	return (f32)(end - start) * g_factorForMiliseconds;
+	return (f32)(end - start) * g_timeFactor;
 }
 
 void consumePrintBuffer(LOG_OUPUT_TYPE type)
 {
 	f32 currentFrameMiliseconds[TIME_FRAME_ELEMENT_COUNT];
+	// TODO: VECTORIZE
 	for (s32 i = 0; i < TIME_FRAME_ELEMENT_COUNT; i++)
 	{
 		f32 start = i_currentFrame.record[i].start;
@@ -37,6 +41,10 @@ void consumePrintBuffer(LOG_OUPUT_TYPE type)
 	const char* printBuffer = getPrintBuffer();
 	switch (type)
 	{
+		u32 len = bufferPtr - printBuffer;
+		OutputDebugStringA("Hello\n");
+		printf("Length = %d\n", len);
+		fflush(stdout);
 		case (LOG_STDOUT):
 		{
 			fwrite(bufferPtr, bufferPtr - printBuffer, 1, stdout);
@@ -45,5 +53,5 @@ void consumePrintBuffer(LOG_OUPUT_TYPE type)
 			break;
 	}
 
-	*pBuffer = printBuffer;
+	*pBuffer = (char*)printBuffer;
 }

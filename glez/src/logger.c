@@ -1,9 +1,10 @@
 #include "logger.h"
 #if LOGS
 #include <time.h>
-#include "win32.h"
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
+#include <stdarg.h>
 
 #define SHOW_TIME 0
 #define SHOW_WRITTEN_BYTES_TO_BUFFER 0
@@ -46,6 +47,13 @@ void logger(LOG_LEVEL level, const char* file, s32 line, const char* fmt, ...)
 		return;
 
 	// TODO: we should lock here if we want to multithread logging
+	const char engineMsg[] = "[GLEZ] ";
+	const char appMsg[] = "[APP] ";
+	u32 charCount = GLEZ_BUILD_DLL ? COUNT_OF(engineMsg) : COUNT_OF(appMsg);
+	const char* msgIssuer = GLEZ_BUILD_DLL ? engineMsg : appMsg;
+	strcpy(i_printBufferPtr, msgIssuer);
+	i_printBufferPtr += charCount;
+
 	u64 len = dontFormat(fmt);
 	if (len) {
 #if SHOW_WRITTEN_BYTES_TO_BUFFER

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "maths.h"
 #include <assert.h>
+#include "logger.h"
 
 
 HWND g_WindowHandle = NULL;
@@ -10,7 +11,7 @@ s32 g_Height = 720;
 s32 g_AspectRatioX = 16;
 s32 g_AspectRatioY = 9;
 bool g_Running = true;
-s64 g_TimeFactor;
+f32 g_TimeFactor = 0.0f;
 HDC g_DC = NULL;
 HGLRC g_GLContext = NULL;
 
@@ -614,8 +615,8 @@ LRESULT win32_windowProcedure(HWND window, UINT message, WPARAM wParam, LPARAM l
 
 		default:
 		{
-			printf("%u : %s\n", message, i_WM_Strings[message]);
-			fprintf(i_SwitchRegister, "case (%s):\n{\n\t\n}\n", i_WM_Strings[message]);
+			logInfo("%u : %s\n", message, i_WM_Strings[message]);
+			//fprintf(i_SwitchRegister, "case (%s):\n{\n\t\n}\n", i_WM_Strings[message]);
 		} break;
 	}
 	return DefWindowProcA(window, message, wParam, lParam);

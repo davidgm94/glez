@@ -8,7 +8,7 @@ s64 g_startPerformanceCounter;
 #include <gl/GL.h>
 
 extern HWND g_WindowHandle;
-extern s64 g_TimeFactor;
+extern f32 g_TimeFactor;
 extern HDC g_DC;
 
 void platformInitialize(void)
@@ -18,8 +18,8 @@ void platformInitialize(void)
 	g_WindowHandle = win32_createWindow(GetModuleHandle(NULL), win32_windowProcedure, 1024, 576, "WindowTitle", NULL);
 	
 	QueryPerformanceFrequency((LARGE_INTEGER*)&g_performanceFrequency);
-	g_TimeFactor = g_performanceFrequency * 1000.0f;
-	printf("QueryPerformanceFrequency returned: %llu\n", (unsigned long long)g_performanceFrequency);
+	g_TimeFactor = 1000.0f / (f32)g_performanceFrequency;
+	logInfo("QueryPerformanceFrequency returned: %llu\n", (unsigned long long)g_performanceFrequency);
 }
 
 APPLICATION_STATUS platformUpdate(void)

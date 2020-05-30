@@ -9,6 +9,7 @@
 #define SHOW_TIME 0
 #define SHOW_WRITTEN_BYTES_TO_BUFFER 0
 #define PRINT_BUFFER_SIZE MEGABYTES(1)
+
 static struct
 {
 	char printBuffer[PRINT_BUFFER_SIZE];
@@ -60,9 +61,6 @@ void logger(LOG_LEVEL level, const char* file, s32 line, const char* fmt, ...)
 
 	u64 len = dontFormat(fmt);
 	if (len) {
-#if SHOW_WRITTEN_BYTES_TO_BUFFER
-		printf("Bytes written to buffer");
-#endif
 		strcpy(i_printBufferPtr, fmt);
 		i_printBufferPtr += len;
 		return;

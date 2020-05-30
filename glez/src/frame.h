@@ -37,3 +37,7 @@ ENUM LOG_OUPUT_TYPE{
 } LOG_OUPUT_TYPE;
 
 void consumePrintBuffer(LOG_OUPUT_TYPE type);
+
+extern FrameRecord i_CurrentFrame;
+#define BEGIN_TIME_BLOCK(name) QueryPerformanceCounter((LARGE_INTEGER*)&i_CurrentFrame.record[name].start)
+#define END_TIME_BLOCK(name) QueryPerformanceCounter((LARGE_INTEGER*)&i_CurrentFrame.record[name].end)

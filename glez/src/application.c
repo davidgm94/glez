@@ -13,18 +13,21 @@ void run(void)
 {
 	logInfo("Engine has started");
 
-	while (platformUpdate())
+	bool running = true;
+	while (running)
 	{
-		char bf[] = "A\n";
-		printf("Hello\n");
-		fwrite(bf, sizeof(bf), 1, stdout);
-		logInfo("Hello\n");
+		BEGIN_TIME_BLOCK(TIME_FRAME_TOTAL);
 		float r = (f32)rand() / (f32)RAND_MAX;
 		float g = (f32)rand() / (f32)RAND_MAX;
 		float b = (f32)rand() / (f32)RAND_MAX;
+		
+		BEGIN_TIME_BLOCK(TIME_FRAME_GPU);
 		glClearColor(r, g, b, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
 		platformSwapBuffers();
-		consumePrintBuffer(0);
+		END_TIME_BLOCK(TIME_FRAME_GPU);
+		running = platformUpdate();
+		END_TIME_BLOCK(TIME_FRAME_TOTAL);
+		consumePrintBuffer(LOG_STDOUT);
 	}
 }

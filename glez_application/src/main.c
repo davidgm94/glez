@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <GLEZ/glez.h>
+
 void createApplication(void)
 {
 	printf("Hello from client\n");

@@ -13,7 +13,6 @@ static struct
 {
 	char printBuffer[PRINT_BUFFER_SIZE];
 	LOG_LEVEL level;
-
 } i_loggerConfig;
 
 static char* i_printBufferPtr = i_loggerConfig.printBuffer;
@@ -39,6 +38,11 @@ char** getPointerToPrintBuffer(void)
 const char* getPrintBuffer(void)
 {
 	return i_loggerConfig.printBuffer;
+}
+
+void initLogger(LOG_LEVEL logLevel)
+{
+	i_loggerConfig.level = logLevel;
 }
 
 void logger(LOG_LEVEL level, const char* file, s32 line, const char* fmt, ...)

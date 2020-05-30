@@ -3,35 +3,42 @@
 #include "lightwindows.h"
 s64 g_performanceFrequency;
 s64 g_startPerformanceCounter;
+
 #include "win32_internal.h"
+#include <gl/GL.h>
+
+extern HWND g_WindowHandle;
+extern s64 g_TimeFactor;
+extern HDC g_DC;
 
 void platformInitialize(void)
 {
-	
+	initLogger(1);
 	logInfo("Initializing Windows");
-	g_Window.windowHandle = win32_createWindow(GetModuleHandle(NULL), win32_windowProcedure, 1024, 576, "WindowTitle", NULL);
+	g_WindowHandle = win32_createWindow(GetModuleHandle(NULL), win32_windowProcedure, 1024, 576, "WindowTitle", NULL);
 	
 	QueryPerformanceFrequency((LARGE_INTEGER*)&g_performanceFrequency);
-	g_timeFactor = g_performanceFrequency * 1000.0f;
+	g_TimeFactor = g_performanceFrequency * 1000.0f;
 	printf("QueryPerformanceFrequency returned: %llu\n", (unsigned long long)g_performanceFrequency);
 }
 
-void platformUpdate(void* windowHandle)
+APPLICATION_STATUS platformUpdate(void)
 {
-	HWND window = (HWND)windowHandle;
+	HWND window = g_WindowHandle;
 	MSG msg = {0};
 	while (PeekMessageA(&msg, window, 0, 0, PM_REMOVE))
 	{
+		if (msg.message == WM_QUIT) {
+			return APPLICATION_FINISHED;
+		}
 		TranslateMessage(&msg);
 		DispatchMessageA(&msg);
 	}
+	return APPLICATION_RUNNING;
 }
 
-f32 win32_getTimeMS(void)
+void platformSwapBuffers(void)
 {
-	s64 performanceCounter;
-	QueryPerformanceCounter((LARGE_INTEGER*)&performanceCounter);
-	s64 differencePerformanceCounter = performanceCounter - g_startPerformanceCounter;
-	f64 ms = (f64)(differencePerformanceCounter * 1000) / (f64)g_performanceFrequency;
-	return (f32)ms;
+	// TODO: is this the same for DirectX and Vulkan?
+	SwapBuffers(g_DC);
 }

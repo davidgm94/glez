@@ -17,7 +17,8 @@ typedef enum LOG_LEVEL {
 #define logError(...) logger(LOG_LEVEL_ERROR, __FILE__, __LINE__, __VA_ARGS__)
 #define logFatal(...) logger(LOG_LEVEL_FATAL, __FILE__, __LINE__, __VA_ARGS__)
 
-void logger(s32 level, const char* file, s32 line, const char* fmt, ...);
+void initLogger(LOG_LEVEL logLevel);
+void logger(LOG_LEVEL level, const char* file, s32 line, const char* fmt, ...);
 char** getPointerToPrintBuffer(void);
 const char* getPrintBuffer(void);
 #else

@@ -1,17 +1,19 @@
-#include "frame.h"
 //#include "win32.c"
 #include "logger.h"
-#include "application.h"
+#include "frame.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include "lightwindows.h"
+
 
 FrameRecord i_currentFrame;
 FrameRecord i_pastFrame;
+extern s64 g_TimeFactor;
 
 static inline f32 computeMS(s64 start, s64 end)
 {
-	return (f32)(end - start) * g_timeFactor;
+	return (f32)(end - start) * g_TimeFactor;
 }
 
 void consumePrintBuffer(LOG_OUPUT_TYPE type)
@@ -39,15 +41,17 @@ void consumePrintBuffer(LOG_OUPUT_TYPE type)
 	char** pBuffer = getPointerToPrintBuffer();
 	const char* bufferPtr = *pBuffer;
 	const char* printBuffer = getPrintBuffer();
+	u32 bytesToWrite = bufferPtr - printBuffer;
+	OutputDebugStringA("Hello\n");
+	printf("Length = %d\n", bytesToWrite);
+	fflush(stdout);
 	switch (type)
 	{
-		u32 len = bufferPtr - printBuffer;
-		OutputDebugStringA("Hello\n");
-		printf("Length = %d\n", len);
-		fflush(stdout);
 		case (LOG_STDOUT):
 		{
-			fwrite(bufferPtr, bufferPtr - printBuffer, 1, stdout);
+			u32 bytesWritten = fwrite(printBuffer, bytesToWrite, 1, stdout);
+			assert(bytesWritten == bytesToWrite);
+			printf("Bytes to write: %u. Bytes written: %u.\n", bytesToWrite, bytesWritten);
 		} break;
 		default:
 			break;

@@ -11,6 +11,7 @@
     <ClInclude Include="src\win32.h" />
     <ClInclude Include="src\lightwindows.h" />
     <ClInclude Include="src\win32_internal.h" />
+    <ClInclude Include="src\maths.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\application.c" />

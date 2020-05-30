@@ -1,9 +1,94 @@
 #include "win32_internal.h"
 #include <stdio.h>
+#include "maths.h"
+#include <assert.h>
+
+
+HWND g_WindowHandle = NULL;
+s32 g_Width = 1280;
+s32 g_Height = 720;
+s32 g_AspectRatioX = 16;
+s32 g_AspectRatioY = 9;
+bool g_Running = true;
+s64 g_TimeFactor;
+HDC g_DC = NULL;
+HGLRC g_GLContext = NULL;
 
 char i_WM_Strings[100000][256];
 #define FILL_ARR(msg) strcpy(i_WM_Strings[msg], #msg)
 FILE* i_SwitchRegister = NULL;
+
+HGLRC win32_createGLContext(HWND window, HDC deviceContext)
+{
+#if 1
+	PIXELFORMATDESCRIPTOR pfd =
+	{
+		.nSize = sizeof(PIXELFORMATDESCRIPTOR),
+		.nVersion = 1,
+		.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_DIRECT3D_ACCELERATED,
+		.iPixelType = PFD_TYPE_RGBA,
+		.cColorBits = 32,
+		.cRedBits = 0,
+		.cRedShift = 0,
+		.cGreenBits = 0,
+		.cGreenShift = 0,
+		.cBlueBits = 0,
+		.cBlueShift = 0,
+		.cAlphaBits = 0,
+		.cAlphaShift = 0,
+		.cAccumBits = 0,
+		.cAccumRedBits = 0,
+		.cAccumGreenBits = 0,
+		.cAccumBlueBits = 0,
+		.cAccumAlphaBits = 0,
+		.cDepthBits = 24,
+		.cStencilBits = 8,
+		.cAuxBuffers = 0,
+		.iLayerType = PFD_MAIN_PLANE,
+		.bReserved = 0,
+		.dwLayerMask = 0,
+		.dwVisibleMask = 0,
+		.dwDamageMask = 0,
+	};
+#else
+	PIXELFORMATDESCRIPTOR pfd;
+	ZeroMemory(&pfd, sizeof(pfd));
+	pfd.nSize = sizeof(pfd);
+	pfd.nVersion = 1;
+	pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+	pfd.iPixelType = PFD_TYPE_RGBA;
+	pfd.cColorBits = 32;
+	pfd.cAlphaBits = 8;
+	pfd.cDepthBits = 24;
+#endif 
+
+	s32 pixelFormatIndex = ChoosePixelFormat(deviceContext, &pfd);
+	assert(pixelFormatIndex > 0);
+	s32 pixelFormatSet = SetPixelFormat(deviceContext, pixelFormatIndex, &pfd);
+	assert(pixelFormatSet == TRUE);
+
+	HGLRC glContext = wglCreateContext(deviceContext);
+	assert(glContext != NULL);
+
+	return glContext;
+}
+
+s32 win32_makeGLContextCurrent(HGLRC glContext, HDC deviceContext)
+{
+	s32 madeCurrent = wglMakeCurrent(deviceContext, glContext);
+	assert(madeCurrent);
+	return madeCurrent;
+}
+
+void win32_deleteGLContext(HDC dc, HGLRC context)
+{
+	HGLRC currentContext = wglGetCurrentContext();
+	if (context == currentContext)
+	{
+		wglMakeCurrent(dc, NULL);
+	}
+	wglDeleteContext(currentContext);
+}
 
 void initWMStrings(void)
 {
@@ -217,38 +302,92 @@ void initWMStrings(void)
 	FILL_ARR(WM_APP);
 }
 
-
-
+	//fprintf(i_SwitchRegister, "case (%s):\n{\n\t\n} break;\n", i_WM_Strings[message]);
 LRESULT win32_windowProcedure(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	//fprintf(i_SwitchRegister, "case (%s):\n{\n\t\n} break;\n", i_WM_Strings[message]);
 	switch (message)
 	{
-		case (WM_NCHITTEST):
+		// First closing message
+		case (WM_CLOSE):
 		{
-
+			g_Running = false;
 		} break;
-		case (WM_GETMINMAXINFO):
+		// Second closing message
+		case (WM_DESTROY):
 		{
-
-		} break;
-		case (WM_NCCREATE):
-		{
-
-		} break;
-		case (WM_NCCALCSIZE):
-		{
-
-		} break;
-		case (WM_CREATE):
-		{
-
-		} break;
-		case (WM_SHOWWINDOW):
-		{
-
+			DestroyWindow(window);
+			ExitProcess(0);
 		} break;
 		case (WM_WINDOWPOSCHANGING):
+		{
+			WINDOWPOS* newPosition = (WINDOWPOS*)lParam;
+
+			RECT windowRect;
+			RECT clientRect;
+			GetWindowRect(window, &windowRect);
+			GetClientRect(window, &clientRect);
+
+			s32 clientWidth = WIN32_WIDTH(clientRect);
+			s32 clientHeight = WIN32_HEIGHT(clientRect);
+			s32 widthAdd = WIN32_WIDTH(windowRect) - clientWidth;
+			s32 heightAdd = WIN32_HEIGHT(windowRect) - clientHeight;
+
+			s32 renderWidth = g_AspectRatioX;
+			s32 renderHeight = g_AspectRatioY;
+
+			if (renderWidth > 0 && renderHeight)
+			{
+				s32 sugX = newPosition->cx;
+				s32 sugY = newPosition->cy;
+
+				s32 newCx = (renderWidth * (sugY - heightAdd)) / renderHeight;
+				s32 newCy = (renderHeight * (sugX - widthAdd)) / renderWidth;
+
+				if (abs_T(sugX - newCx) < abs_T(sugY - newCy))
+				{
+					newPosition->cx = newCx + widthAdd;
+				}
+				else
+				{
+					newPosition->cy = newCy + heightAdd;
+				}
+			}
+			return DefWindowProcA(window, message, wParam, lParam);
+		} break;
+		case (WM_WINDOWPOSCHANGED):
+		{
+			WINDOWPOS* newPos = (WINDOWPOS*)lParam;
+			bool fullScreen = false;
+			MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+			if (GetMonitorInfoA(MonitorFromWindow(window, MONITOR_DEFAULTTOPRIMARY), &monitorInfo))
+			{
+				s32 monitorWidth = WIN32_WIDTH(monitorInfo.rcMonitor);
+				s32 monitorHeight = WIN32_HEIGHT(monitorInfo.rcMonitor);
+				fullScreen =
+					monitorInfo.rcMonitor.left == newPos->x &&
+					monitorInfo.rcMonitor.top == newPos->y &&
+					monitorWidth == newPos->cx &&
+					monitorHeight == newPos->cy;
+			}
+
+			DWORD oldStyle = GetWindowLong(window, GWL_STYLE);
+			DWORD fullScreenStyle = oldStyle & ~WS_OVERLAPPEDWINDOW;
+			DWORD windowedStyle = oldStyle | WS_OVERLAPPEDWINDOW;
+			DWORD newStyle = fullScreen ? fullScreenStyle : windowedStyle;
+
+			if (newStyle != oldStyle)
+			{
+				SetWindowLongA(window, GWL_STYLE, newStyle);
+			}
+
+			return DefWindowProcA(window, message, wParam, lParam);
+		} break;
+		case (WM_NCHITTEST):
+		case (WM_GETMINMAXINFO):
+		case (WM_NCCREATE):
+		case (WM_NCCALCSIZE):
+		case (WM_CREATE):
+		case (WM_SHOWWINDOW):
 		{
 
 		} break;
@@ -268,7 +407,6 @@ LRESULT win32_windowProcedure(HWND window, UINT message, WPARAM wParam, LPARAM l
 		{
 
 		} break;
-		case (WM_DESTROY):
 		case (WM_IME_SETCONTEXT):
 		{
 
@@ -286,10 +424,6 @@ LRESULT win32_windowProcedure(HWND window, UINT message, WPARAM wParam, LPARAM l
 
 		} break;
 		case (WM_ERASEBKGND):
-		{
-
-		} break;
-		case (WM_WINDOWPOSCHANGED):
 		{
 
 		} break;
@@ -333,10 +467,6 @@ LRESULT win32_windowProcedure(HWND window, UINT message, WPARAM wParam, LPARAM l
 		{
 
 		} break;
-		case (WM_CLOSE):
-		{
-
-		} break;
 		case (WM_KILLFOCUS):
 		{
 
@@ -359,15 +489,133 @@ LRESULT win32_windowProcedure(HWND window, UINT message, WPARAM wParam, LPARAM l
 		} break;
 		case (WM_SIZING):
 		{
-			
+
 		} break;
 		case (WM_EXITSIZEMOVE):
 		{
-			
+
 		} break;
+		case (WM_NCLBUTTONDBLCLK):
+		{
+
+		} break;
+		case (WM_LBUTTONUP):
+		{
+
+		} break;
+		case (WM_QUERYOPEN):
+		{
+
+		} break;
+		case (WM_RBUTTONDOWN):
+		{
+
+		} break;
+		case (WM_RBUTTONUP):
+		{
+
+		} break;
+		case (WM_CONTEXTMENU):
+		{
+
+		} break;
+		case (WM_MBUTTONDOWN):
+		{
+
+		} break;
+		case (WM_MBUTTONUP):
+		{
+
+		} break;
+		case (WM_KEYDOWN):
+		{
+
+		} break;
+		case (WM_KEYUP):
+		{
+
+		} break;
+		case (WM_CHAR):
+		{
+
+		} break;
+		case (WM_LBUTTONDOWN):
+		{
+
+		} break;
+		case (WM_ENTERMENULOOP):
+		{
+
+		} break;
+		case (WM_INITMENU):
+		{
+
+		} break;
+		case (WM_MENUSELECT):
+		{
+
+		} break;
+		case (WM_INITMENUPOPUP):
+		{
+
+		} break;
+		case (WM_MOUSEWHEEL):
+		{
+
+		} break;
+		case (WM_MOUSEHWHEEL):
+		{
+
+		} break;
+		case (WM_SYSKEYDOWN):
+		{
+
+		} break;
+		case (WM_SYSKEYUP):
+		{
+
+		} break;
+		case (WM_ENTERIDLE):
+		{
+
+		} break;
+		case (WM_EXITMENULOOP):
+		{
+
+		} break;
+		case (WM_INPUTLANGCHANGE):
+		{
+
+		} break;
+		case (WM_HELP):
+		{
+
+		} break;
+		case (WM_CANCELMODE):
+		{
+
+		} break;
+		case (WM_NCRBUTTONDOWN):
+		{
+
+		} break;
+#ifndef WM_KEYF1
+#define WM_KEYF1 0x4D
+#endif
+		case (WM_KEYF1):
+		case (799):
+		case (49385):
+		case (49361):
+#define WM_NCUAHDRAWCAPTION 0xAE
+		case (WM_NCUAHDRAWCAPTION):
+		case (144):
+		{
+		} break;
+
 		default:
 		{
 			printf("%u : %s\n", message, i_WM_Strings[message]);
+			fprintf(i_SwitchRegister, "case (%s):\n{\n\t\n}\n", i_WM_Strings[message]);
 		} break;
 	}
 	return DefWindowProcA(window, message, wParam, lParam);
@@ -380,7 +628,7 @@ HWND win32_createWindow(HINSTANCE instance, WNDPROC windowProcedure, s32 width, 
 	{
 		.cbWndExtra = 64,
 		.cbSize = sizeof(windowClass),
-		.style = CS_HREDRAW | CS_VREDRAW,
+		.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC,
 		.lpfnWndProc = windowProcedure,
 		.hCursor = LoadCursor(NULL, IDC_ARROW),
 		.lpszClassName = "Window Class",
@@ -390,12 +638,17 @@ HWND win32_createWindow(HINSTANCE instance, WNDPROC windowProcedure, s32 width, 
 	RECT windowRect = { 0, 0, width, height };
 	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
 
-	HWND window = CreateWindowA(windowClass.lpszClassName, title, WS_OVERLAPPEDWINDOW,
+	g_WindowHandle = CreateWindowA(windowClass.lpszClassName, title, WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
 		NULL, NULL, instance, pData);
-	ShowWindow(window, SW_SHOW);
-	UpdateWindow(window);
 
-	return window;
+	g_DC = GetDC(g_WindowHandle);
+	g_GLContext = win32_createGLContext(g_WindowHandle, g_DC);
+	s32 result = win32_makeGLContextCurrent(g_GLContext, g_DC);
+
+	ShowWindow(g_WindowHandle, SW_SHOW);
+	UpdateWindow(g_WindowHandle);
+
+	return g_WindowHandle;
 } 

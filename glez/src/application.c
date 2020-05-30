@@ -7,15 +7,24 @@
 #else
 #pragma error
 #endif
+#include <stdlib.h>
 
 void run(void)
 {
 	logInfo("Engine has started");
 
-	int i = 0;
-	while (true)
+	while (platformUpdate())
 	{
-		platformUpdate(g_Window.windowHandle);
-		//consumePrintBuffer(LOG_STDOUT);
+		char bf[] = "A\n";
+		printf("Hello\n");
+		fwrite(bf, sizeof(bf), 1, stdout);
+		logInfo("Hello\n");
+		float r = (f32)rand() / (f32)RAND_MAX;
+		float g = (f32)rand() / (f32)RAND_MAX;
+		float b = (f32)rand() / (f32)RAND_MAX;
+		glClearColor(r, g, b, 1);
+		glClear(GL_COLOR_BUFFER_BIT);
+		platformSwapBuffers();
+		consumePrintBuffer(0);
 	}
 }

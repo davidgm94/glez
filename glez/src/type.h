@@ -9,6 +9,15 @@
 #define GAME_DEBUG
 #endif
 
+#ifdef GLEZ_PLATFORM_WINDOWS
+	#ifdef GLEZ_BUILD_DLL
+		#define GLEZ_API __declspec(dllexport)
+	#else
+		#define GLEZ_API __declspec(dllimport)
+	#endif
+#else
+#pragma error "Windows is the only platform supported at the moment"
+#endif
 
 /*** TYPES ***/
 
@@ -61,3 +70,37 @@ typedef f32 vec3f_shader[3];
 
 #define GENERATE_ENUM(ENUM) ENUM,
 #define GENERATE_STRING(STRING) #STRING,
+
+#define BEGIN_TIME_BLOCK(name) QueryPerformanceCounter((LARGE_INTEGER*)&i_CurrentFrame.record[name].start)
+#define END_TIME_BLOCK(name) QueryPerformanceCounter((LARGE_INTEGER*)&i_CurrentFrame.record[name].end)
+#define _FOREACH_TIME_BLOCK(TIME_BLOCK)\
+    TIME_BLOCK(TIME_FRAME_TOTAL)\
+    TIME_BLOCK(TIME_FRAME_CPU)\
+    TIME_BLOCK(TIME_FRAME_GPU)\
+    /*TIME_BLOCK(TIME_FRAME_UPDATE)*/\
+	TIME_BLOCK(TIME_FRAME_ELEMENT_COUNT)
+
+ENUM TIME_BLOCK {
+_FOREACH_TIME_BLOCK(GENERATE_ENUM)
+} TIME_BLOCK;
+
+static const char* TIME_BLOCK_STRING[] =
+{
+	_FOREACH_TIME_BLOCK(GENERATE_STRING)
+};
+
+STRUCT TimingRecord
+{
+#if GLEZ_PLATFORM_WINDOWS
+	s64 start;
+	s64 end;
+#endif
+} TimingRecord;
+
+STRUCT FrameRecord
+{
+	TimingRecord record[TIME_FRAME_ELEMENT_COUNT];
+} FrameRecord;
+
+extern FrameRecord i_CurrentFrame;
+

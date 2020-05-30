@@ -8,4 +8,5 @@ win32lib/
 *~
 *.log
 *.swap
+*.swp
 cmake*

@@ -9,25 +9,21 @@
 #endif
 #include <stdlib.h>
 
-void run(void)
+bool endFrame(void)
 {
-	logInfo("Engine has started");
+	platformSwapBuffers();
+	endTimeBlock(TIME_FRAME_GPU);
+	bool running = platformUpdate();
+	endTimeBlock(TIME_FRAME_TOTAL);
+	consumePrintBuffer(LOG_STDOUT);
+	return running;
+}
 
-	bool running = true;
-	while (running)
-	{
-		BEGIN_TIME_BLOCK(TIME_FRAME_TOTAL);
-		float r = (f32)rand() / (f32)RAND_MAX;
-		float g = (f32)rand() / (f32)RAND_MAX;
-		float b = (f32)rand() / (f32)RAND_MAX;
-		
-		BEGIN_TIME_BLOCK(TIME_FRAME_GPU);
-		glClearColor(r, g, b, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
-		platformSwapBuffers();
-		END_TIME_BLOCK(TIME_FRAME_GPU);
-		running = platformUpdate();
-		END_TIME_BLOCK(TIME_FRAME_TOTAL);
-		consumePrintBuffer(LOG_STDOUT);
-	}
+void beginTimeBlock(TIME_BLOCK timeblock)
+{
+	QueryPerformanceCounter((LARGE_INTEGER*)&i_CurrentFrame.record[timeblock].start);
+}
+void endTimeBlock(TIME_BLOCK timeblock)
+{
+	QueryPerformanceCounter((LARGE_INTEGER*)&i_CurrentFrame.record[timeblock].end);
 }

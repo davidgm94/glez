@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="src\core.h" />
     <ClInclude Include="src\application.h" />
     <ClInclude Include="src\type.h" />
     <ClInclude Include="src\logger.h" />
@@ -12,11 +11,13 @@
     <ClInclude Include="src\lightwindows.h" />
     <ClInclude Include="src\win32_internal.h" />
     <ClInclude Include="src\maths.h" />
+    <ClInclude Include="src\renderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\application.c" />
     <ClCompile Include="src\logger.c" />
     <ClCompile Include="src\frame.c" />
     <ClCompile Include="src\win32_internal.c" />
+    <ClCompile Include="src\renderer.c" />
   </ItemGroup>
 </Project>

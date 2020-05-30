@@ -16,9 +16,9 @@
     <ClInclude Include="src\lightwindows.h" />
     <ClInclude Include="src\logger.h" />
     <ClInclude Include="src\application.h" />
-    <ClInclude Include="src\core.h" />
     <ClInclude Include="include\GLEZ\glez.h" />
     <ClInclude Include="src\maths.h" />
+    <ClInclude Include="src\renderer.h" />
     <ClInclude Include="src\type.h" />
     <ClInclude Include="src\win32.h" />
     <ClInclude Include="src\win32_internal.h" />
@@ -27,6 +27,7 @@
     <ClCompile Include="src\frame.c" />
     <ClCompile Include="src\logger.c" />
     <ClCompile Include="src\application.c" />
+    <ClCompile Include="src\renderer.c" />
     <ClCompile Include="src\win32_internal.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -46,17 +46,14 @@ void initLogger(LOG_LEVEL logLevel)
 	i_loggerConfig.level = logLevel;
 }
 
-void logger(LOG_LEVEL level, const char* file, s32 line, const char* fmt, ...)
+void logger(const char* logContext, u32 charCount, LOG_LEVEL level, const char* file, s32 line, const char* fmt, ...)
 {
 	if (!level || level < i_loggerConfig.level)
 		return;
 
 	// TODO: we should lock here if we want to multithread logging
-	const char engineMsg[] = "[GLEZ] ";
-	const char appMsg[] = "[APP] ";
-	u32 charCount = GLEZ_BUILD_DLL ? COUNT_OF(engineMsg) : COUNT_OF(appMsg);
-	const char* msgIssuer = GLEZ_BUILD_DLL ? engineMsg : appMsg;
-	strcpy(i_printBufferPtr, msgIssuer);
+	
+	strcpy(i_printBufferPtr, logContext);
 	i_printBufferPtr += charCount;
 
 	u64 len = dontFormat(fmt);

@@ -647,6 +647,7 @@ HWND win32_createWindow(HINSTANCE instance, WNDPROC windowProcedure, s32 width, 
 	g_DC = GetDC(g_WindowHandle);
 	g_GLContext = win32_createGLContext(g_WindowHandle, g_DC);
 	s32 result = win32_makeGLContextCurrent(g_GLContext, g_DC);
+	assert(result);
 
 	ShowWindow(g_WindowHandle, SW_SHOW);
 	UpdateWindow(g_WindowHandle);

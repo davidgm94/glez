@@ -31,19 +31,7 @@ static inline void logFrametimeInfo(float* currentFrameMiliseconds)
                  (currentFrameMiliseconds[TIME_FRAME_GPU] / currentFrameMiliseconds[TIME_FRAME_TOTAL]) * 100.0f);
 }
 
-static inline void printFrameInfo(float* currentFrameMiliseconds)
-{
-	printf("NEW FRAME:\n");
-
-	for (s32 i = 0; i < TIME_FRAME_ELEMENT_COUNT; i++)
-	{
-		printf("\t* [%s] %.02f ms.\n", TIME_BLOCK_STRING[i], currentFrameMiliseconds[i]);
-	}
-	printf("\t* [TIME_FRAME_SUMMARY] CPU: %.02f%%. GPU: %.02f%%\n",
-                 (currentFrameMiliseconds[TIME_FRAME_CPU] / currentFrameMiliseconds[TIME_FRAME_TOTAL]) * 100.0f,
-                 (currentFrameMiliseconds[TIME_FRAME_GPU] / currentFrameMiliseconds[TIME_FRAME_TOTAL]) * 100.0f);
-}
-void printAndResetFrameStringBuffer(LOG_OUPUT_TYPE outputType)
+static inline void printFrameStringBuffer(LOG_OUPUT_TYPE outputType)
 {
 	char** pBuffer = getPointerToPrintBuffer();
 	const char* printBuffer = getPrintBuffer();
@@ -59,7 +47,11 @@ void printAndResetFrameStringBuffer(LOG_OUPUT_TYPE outputType)
 			break;
 	}
 
-	*pBuffer = (char*)printBuffer;
+}
+
+static inline void resetFrameStringBuffer(void)
+{
+	*getPointerToPrintBuffer() = (char*) getPrintBuffer();
 }
 
 void consumePrintBuffer(LOG_OUPUT_TYPE type)
@@ -81,9 +73,6 @@ void consumePrintBuffer(LOG_OUPUT_TYPE type)
 	
 	logFrametimeInfo(currentFrameMiliseconds);
 
-	printFrameInfo(currentFrameMiliseconds);
-
-	//printAndResetFrameStringBuffer(type);
-	*getPointerToPrintBuffer() = getPrintBuffer();
+	printFrameStringBuffer(type);
+	resetFrameStringBuffer();
 }
-

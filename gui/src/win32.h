@@ -1,99 +1,49 @@
-#include "win32_internal.h"
+#pragma once
 #include <stdio.h>
-#include "maths.h"
-#include <assert.h>
-#include "logger.h"
+#define STRUCT typedef struct
+#define ENUM typedef enum
+#define UNION typedef union
+#ifndef __cplusplus
+typedef _Bool bool;
+#define true 1
+#define false 0
+#endif
+#include <stdint.h>
+typedef uint8_t  u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef int8_t  s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef int64_t s64;
+typedef float f32;
+typedef double f64;
+#define COUNT_OF(___arr) ((sizeof(___arr)) / (sizeof(___arr[0])))
+#define BYTES(n) 	 ((u64)n)
+#define KILOBYTES(n) (1024 * BYTES(n))
+#define MEGABYTES(n) (1024 * KILOBYTES(n))
+#define GIGABYTES(n) (1024 * MEGABYTES(n))
+#define TERABYTES(n) (1024 * GIGABYTES(n))
+#define VECTOR_TYPE(length) __attribute__((ext_vector_type(length)))
+#define VECTOR_TYPE_ALIGNMENT(length, alignment) __attribute__((ext_vector_type(length))) __attribute__((aligned(alignment)))
+#define INTRINSIC_INLINE __inline__
+#define ALIGNED(bytes) __declspec(align(bytes))
 
-
-HWND g_WindowHandle = NULL;
-s32 g_Width = 1280;
-s32 g_Height = 720;
-s32 g_AspectRatioX = 16;
-s32 g_AspectRatioY = 9;
-bool g_Running = true;
-f32 g_TimeFactor = 0.0f;
-HDC g_DC = NULL;
-HGLRC g_GLContext = NULL;
-
+#define VC_EXTRALEAN
+#define WIN32_LEAN_AND_MEAN 
+#include <Windows.h>
 char i_WM_Strings[100000][256];
 #define FILL_ARR(msg) strcpy(i_WM_Strings[msg], #msg)
-FILE* i_SwitchRegister = NULL;
+#define abs_T(x) (((x) > 0) ? (x) : -(x))
+#define WIN32_WIDTH(_struct) (_struct.right - _struct.left)
+#define WIN32_HEIGHT(_struct) (_struct.bottom - _struct.top)
 
-HGLRC win32_createGLContext(HWND window, HDC deviceContext)
-{
-#if 1
-	PIXELFORMATDESCRIPTOR pfd =
-	{
-		.nSize = sizeof(PIXELFORMATDESCRIPTOR),
-		.nVersion = 1,
-		.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_DIRECT3D_ACCELERATED,
-		.iPixelType = PFD_TYPE_RGBA,
-		.cColorBits = 32,
-		.cRedBits = 0,
-		.cRedShift = 0,
-		.cGreenBits = 0,
-		.cGreenShift = 0,
-		.cBlueBits = 0,
-		.cBlueShift = 0,
-		.cAlphaBits = 0,
-		.cAlphaShift = 0,
-		.cAccumBits = 0,
-		.cAccumRedBits = 0,
-		.cAccumGreenBits = 0,
-		.cAccumBlueBits = 0,
-		.cAccumAlphaBits = 0,
-		.cDepthBits = 24,
-		.cStencilBits = 8,
-		.cAuxBuffers = 0,
-		.iLayerType = PFD_MAIN_PLANE,
-		.bReserved = 0,
-		.dwLayerMask = 0,
-		.dwVisibleMask = 0,
-		.dwDamageMask = 0,
-	};
-#else
-	PIXELFORMATDESCRIPTOR pfd;
-	ZeroMemory(&pfd, sizeof(pfd));
-	pfd.nSize = sizeof(pfd);
-	pfd.nVersion = 1;
-	pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-	pfd.iPixelType = PFD_TYPE_RGBA;
-	pfd.cColorBits = 32;
-	pfd.cAlphaBits = 8;
-	pfd.cDepthBits = 24;
-#endif 
-
-	s32 pixelFormatIndex = ChoosePixelFormat(deviceContext, &pfd);
-	assert(pixelFormatIndex > 0);
-	s32 pixelFormatSet = SetPixelFormat(deviceContext, pixelFormatIndex, &pfd);
-	assert(pixelFormatSet == TRUE);
-
-	HGLRC glContext = wglCreateContext(deviceContext);
-	assert(glContext != NULL);
-
-	return glContext;
-}
-
-s32 win32_makeGLContextCurrent(HGLRC glContext, HDC deviceContext)
-{
-	s32 madeCurrent = wglMakeCurrent(deviceContext, glContext);
-	assert(madeCurrent);
-	return madeCurrent;
-}
-
-void win32_deleteGLContext(HDC dc, HGLRC context)
-{
-	HGLRC currentContext = wglGetCurrentContext();
-	if (context == currentContext)
-	{
-		wglMakeCurrent(dc, NULL);
-	}
-	wglDeleteContext(currentContext);
-}
+bool g_Running = true;
+HWND g_WindowHandle = NULL;
 
 void initWMStrings(void)
 {
-	i_SwitchRegister = fopen("switch_register.log", "w");
 	FILL_ARR(WM_WINDOWPOSCHANGING);
 	FILL_ARR(WM_MOUSEMOVE);
 	FILL_ARR(WM_NULL);
@@ -310,9 +260,14 @@ LRESULT win32_windowProcedure(HWND window, UINT message, WPARAM wParam, LPARAM l
 	{
 		// First closing message
 		case (WM_CLOSE):
-		case (WM_DESTROY):
 		{
 			g_Running = false;
+		} break;
+		// Second closing message
+		case (WM_DESTROY):
+		{
+			DestroyWindow(window);
+			ExitProcess(0);
 		} break;
 		case (WM_WINDOWPOSCHANGING):
 		{
@@ -328,8 +283,8 @@ LRESULT win32_windowProcedure(HWND window, UINT message, WPARAM wParam, LPARAM l
 			s32 widthAdd = WIN32_WIDTH(windowRect) - clientWidth;
 			s32 heightAdd = WIN32_HEIGHT(windowRect) - clientHeight;
 
-			s32 renderWidth = g_AspectRatioX;
-			s32 renderHeight = g_AspectRatioY;
+			s32 renderWidth = 16;
+			s32 renderHeight = 9;
 
 			if (renderWidth > 0 && renderHeight)
 			{
@@ -610,7 +565,7 @@ LRESULT win32_windowProcedure(HWND window, UINT message, WPARAM wParam, LPARAM l
 
 		default:
 		{
-			logInfo("%u : %s\n", message, i_WM_Strings[message]);
+			printf("%u : %s\n", message, i_WM_Strings[message]);
 			//fprintf(i_SwitchRegister, "case (%s):\n{\n\t\n}\n", i_WM_Strings[message]);
 		} break;
 	}
@@ -638,11 +593,6 @@ HWND win32_createWindow(HINSTANCE instance, WNDPROC windowProcedure, s32 width, 
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
 		NULL, NULL, instance, pData);
-
-	g_DC = GetDC(g_WindowHandle);
-	g_GLContext = win32_createGLContext(g_WindowHandle, g_DC);
-	s32 result = win32_makeGLContextCurrent(g_GLContext, g_DC);
-	assert(result);
 
 	ShowWindow(g_WindowHandle, SW_SHOW);
 	UpdateWindow(g_WindowHandle);

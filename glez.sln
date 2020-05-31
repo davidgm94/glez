@@ -10,6 +10,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glez_application", "glez_ap
 		{DA72F66B-845E-4F30-9D2F-7C0A6DA3A179} = {DA72F66B-845E-4F30-9D2F-7C0A6DA3A179}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gui", "gui\gui.vcxproj", "{1715CF9B-004F-4E72-909D-535C1FE13039}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -24,6 +26,10 @@ Global
 		{D43D317F-0FE1-4C09-B97E-ADC9230BF474}.Debug|x64.Build.0 = Debug|x64
 		{D43D317F-0FE1-4C09-B97E-ADC9230BF474}.Release|x64.ActiveCfg = Release|x64
 		{D43D317F-0FE1-4C09-B97E-ADC9230BF474}.Release|x64.Build.0 = Release|x64
+		{1715CF9B-004F-4E72-909D-535C1FE13039}.Debug|x64.ActiveCfg = Debug|x64
+		{1715CF9B-004F-4E72-909D-535C1FE13039}.Debug|x64.Build.0 = Debug|x64
+		{1715CF9B-004F-4E72-909D-535C1FE13039}.Release|x64.ActiveCfg = Release|x64
+		{1715CF9B-004F-4E72-909D-535C1FE13039}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

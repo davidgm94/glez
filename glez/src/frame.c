@@ -9,6 +9,7 @@
 FrameRecord i_CurrentFrame;
 FrameRecord i_PastFrame;
 extern f32 g_TimeFactor;
+extern bool g_Running;
 
 static inline f64 computeMS(s64 start, s64 end)
 {
@@ -20,15 +21,16 @@ static inline f64 computeMS(s64 start, s64 end)
 
 static inline void logFrametimeInfo(float* currentFrameMiliseconds)
 {
-	logInfo("NEW FRAME:\n");
-
-	for (s32 i = 0; i < TIME_FRAME_ELEMENT_COUNT; i++)
-	{
-		logInfo("\t* [%s] %.02f ms.\n", TIME_BLOCK_STRING[i], currentFrameMiliseconds[i]);
-	}
-	logInfo("\t* [TIME_FRAME_SUMMARY] CPU: %.02f%%. GPU: %.02f%%\n",
-                 (currentFrameMiliseconds[TIME_FRAME_CPU] / currentFrameMiliseconds[TIME_FRAME_TOTAL]) * 100.0f,
-                 (currentFrameMiliseconds[TIME_FRAME_GPU] / currentFrameMiliseconds[TIME_FRAME_TOTAL]) * 100.0f);
+	static u64 frameCount = 0;
+	char** ppPrintBuffer = getPointerToPrintBuffer();
+	(*ppPrintBuffer) += sprintf((*ppPrintBuffer), "[[FRAME %llu]] : [TOTAL] %.02f ms. [CPU] %.02f ms (%.02f%%). [GPU] %.02f ms (%.02f%%).\n",
+		++frameCount,
+		currentFrameMiliseconds[TIME_FRAME_TOTAL],
+		currentFrameMiliseconds[TIME_FRAME_CPU],
+		(currentFrameMiliseconds[TIME_FRAME_CPU] / currentFrameMiliseconds[TIME_FRAME_TOTAL]) * 100.0f,
+		currentFrameMiliseconds[TIME_FRAME_GPU],
+		(currentFrameMiliseconds[TIME_FRAME_GPU] / currentFrameMiliseconds[TIME_FRAME_TOTAL]) * 100.0f
+	);
 }
 
 static inline void printFrameStringBuffer(LOG_OUPUT_TYPE outputType)
@@ -56,22 +58,20 @@ static inline void resetFrameStringBuffer(void)
 
 void consumePrintBuffer(LOG_OUPUT_TYPE type)
 {
-    // TIME_BLOCK(TIME_FRAME_TOTAL)\
-    // TIME_BLOCK(TIME_FRAME_CPU)\
-    // TIME_BLOCK(TIME_FRAME_GPU)\
-    // /*TIME_BLOCK(TIME_FRAME_UPDATE)*/\
-	// TIME_BLOCK(TIME_FRAME_ELEMENT_COUNT)
-	f32 currentFrameMiliseconds[TIME_FRAME_ELEMENT_COUNT];
-	// TODO: VECTORIZE
-	for (s32 i = 0; i < TIME_FRAME_ELEMENT_COUNT; i++)
+	if (g_Running)
 	{
-		s64 start = i_CurrentFrame.record[i].start;
-		s64 end = i_CurrentFrame.record[i].end;
-		currentFrameMiliseconds[i] = computeMS(start, end);
+		f32 currentFrameMiliseconds[TIME_FRAME_ELEMENT_COUNT];
+		// TODO: VECTORIZE
+		for (s32 i = 0; i < TIME_FRAME_ELEMENT_COUNT; i++)
+		{
+			s64 start = i_CurrentFrame.record[i].start;
+			s64 end = i_CurrentFrame.record[i].end;
+			currentFrameMiliseconds[i] = computeMS(start, end);
+		}
+		currentFrameMiliseconds[TIME_FRAME_CPU] = currentFrameMiliseconds[TIME_FRAME_TOTAL] - currentFrameMiliseconds[TIME_FRAME_GPU];
+
+		logFrametimeInfo(currentFrameMiliseconds);
 	}
-	currentFrameMiliseconds[TIME_FRAME_CPU] = currentFrameMiliseconds[TIME_FRAME_TOTAL] - currentFrameMiliseconds[TIME_FRAME_GPU];
-	
-	logFrametimeInfo(currentFrameMiliseconds);
 
 	printFrameStringBuffer(type);
 	resetFrameStringBuffer();

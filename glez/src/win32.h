@@ -9,29 +9,30 @@ s64 g_startPerformanceCounter;
 extern HWND g_WindowHandle;
 extern f32 g_TimeFactor;
 extern HDC g_DC;
+extern bool g_Running;
 
 void platformInitialize(void)
 {
 	initLogger(1);
-	g_WindowHandle = win32_createWindow(GetModuleHandle(NULL), win32_windowProcedure, 1024, 576, "WindowTitle", NULL);
+	g_WindowHandle = win32_createWindow(GetModuleHandle(NULL), win32_windowProcedure, 1280, 720, "GLEZ Engine", NULL);
 	
 	QueryPerformanceFrequency((LARGE_INTEGER*)&g_performanceFrequency);
 	g_TimeFactor = 1000.0f / (f32)g_performanceFrequency;
+	QueryPerformanceCounter((LARGE_INTEGER*)&g_startPerformanceCounter);
 }
 
 APPLICATION_STATUS platformUpdate(void)
 {
 	HWND window = g_WindowHandle;
-	MSG msg = {0};
+	MSG msg;
 	while (PeekMessageA(&msg, window, 0, 0, PM_REMOVE))
 	{
-		if (msg.message == WM_QUIT) {
-			return APPLICATION_FINISHED;
-		}
 		TranslateMessage(&msg);
 		DispatchMessageA(&msg);
 	}
-	return APPLICATION_RUNNING;
+
+	// TODO: Handle other states
+	return g_Running ? APPLICATION_RUNNING : APPLICATION_FINISHED;
 }
 
 void platformSwapBuffers(void)

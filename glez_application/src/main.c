@@ -3,6 +3,7 @@
 
 void createApplication(void)
 {
+	
 }
 
 void doFrame(void)
@@ -17,5 +18,5 @@ void doFrame(void)
 
 void deleteApplication(void)
 {
-	printf("Goodbye GLEZ application --client side\n");
+	logInfo("Application finishing...\n");
 }

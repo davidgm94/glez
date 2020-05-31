@@ -10,6 +10,7 @@ typedef enum APPLICATION_STATUS
 
 GLEZ_API void platformInitialize(void);
 APPLICATION_STATUS platformUpdate(void);
-GLEZ_API bool endFrame(void);
+GLEZ_API bool applicationRuns(void);
 GLEZ_API void beginTimeBlock(TIME_BLOCK timeblock);
 GLEZ_API void endTimeBlock(TIME_BLOCK timeblock);
+GLEZ_API void destroyEngine(void);

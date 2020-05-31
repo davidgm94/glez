@@ -569,7 +569,7 @@ public:
 
 	template <typename T> T* allocate(size_t size)
 	{
-		assert(count < sizeof(blocks) / sizeof(blocks[0]));
+		assert(count < sizeof(blocks) / sizeof(blocks[0]))
 		T* result = static_cast<T*>(Storage::allocate(size > size_t(-1) / sizeof(T) ? size_t(-1) : size * sizeof(T)));
 		blocks[count++] = result;
 		return result;

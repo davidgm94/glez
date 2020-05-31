@@ -4,18 +4,18 @@ extern void doFrame(void);
 extern void createApplication(void);
 extern void deleteApplication(void);
 
+#include <stdio.h>
 s32 main(s32 argc, char* argv[])
 {
 	platformInitialize();
 	createApplication();
 
-	bool running = true;
 	do
 	{
-		beginTimeBlock(TIME_FRAME_TOTAL);
+		// GPU-timing should be set in user code
 		doFrame();
-		endFrame();
-	} while (running);
+	} while (applicationRuns());
 
 	deleteApplication();
+	destroyEngine();
 }

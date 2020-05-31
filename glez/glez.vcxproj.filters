@@ -5,13 +5,22 @@
     <ClInclude Include="src\type.h" />
     <ClInclude Include="src\logger.h" />
     <ClInclude Include="src\entry_point.h" />
-    <ClInclude Include="include\GLEZ\glez.h" />
     <ClInclude Include="src\frame.h" />
     <ClInclude Include="src\win32.h" />
     <ClInclude Include="src\lightwindows.h" />
     <ClInclude Include="src\win32_internal.h" />
     <ClInclude Include="src\maths.h" />
     <ClInclude Include="src\renderer.h" />
+    <ClInclude Include="src\openGL\gl.h" />
+    <ClInclude Include="src\openGL\glad.h" />
+    <ClInclude Include="src\openGL\khrplatform.h" />
+    <ClInclude Include="src\file.h" />
+    <ClInclude Include="src\tex.h" />
+    <ClInclude Include="src\stb\stb_image.h" />
+    <ClInclude Include="src\stb\stb_ds.h" />
+    <ClInclude Include="src\meshopt\fast_obj.h" />
+    <ClInclude Include="src\meshopt\meshoptimizer.h" />
+    <ClInclude Include="src\model.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\application.c" />
@@ -19,5 +28,18 @@
     <ClCompile Include="src\frame.c" />
     <ClCompile Include="src\win32_internal.c" />
     <ClCompile Include="src\renderer.c" />
+    <ClCompile Include="src\openGL\gl.c" />
+    <ClCompile Include="src\openGL\glad.c" />
+    <ClCompile Include="src\file.c" />
+    <ClCompile Include="src\tex.c" />
+    <ClCompile Include="src\stb\stb_image.c" />
+    <ClCompile Include="src\stb\stb_ds.c" />
+    <ClCompile Include="src\meshopt\fast_obj.c" />
+    <ClCompile Include="src\meshopt\meshoptimizer.c" />
+    <ClCompile Include="src\model.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\triangle_frag.glsl" />
+    <None Include="src\shaders\triangle_vert.glsl" />
   </ItemGroup>
 </Project>

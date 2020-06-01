@@ -21,6 +21,8 @@
     <ClInclude Include="src\meshopt\fast_obj.h" />
     <ClInclude Include="src\meshopt\meshoptimizer.h" />
     <ClInclude Include="src\model.h" />
+    <ClInclude Include="include\GLEZ\glez.h" />
+    <ClInclude Include="src\allocator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\application.c" />
@@ -37,6 +39,7 @@
     <ClCompile Include="src\meshopt\fast_obj.c" />
     <ClCompile Include="src\meshopt\meshoptimizer.c" />
     <ClCompile Include="src\model.c" />
+    <ClCompile Include="src\allocator.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\triangle_frag.glsl" />

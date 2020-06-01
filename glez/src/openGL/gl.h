@@ -1,5 +1,6 @@
 #pragma once
 #include "type.h"
+#include "glad.h"
 typedef int S_OpenGLHandle;
 typedef unsigned U_OpenGLHandle;
 

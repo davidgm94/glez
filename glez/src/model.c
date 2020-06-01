@@ -10,15 +10,15 @@ Mesh meshLoad(const char* path)
 	fastObjMesh* obj = fast_obj_read(path);
 	assert(obj);
 
-	u64 index_count = 0;
+	u64 indexCount = 0;
 	u32 face_count = obj->face_count;
 	for (u32 i = 0; i < face_count; i++)
 	{
-		index_count += 3 * (obj->face_vertices[i] - 2);
+		indexCount += 3 * (obj->face_vertices[i] - 2);
 	}
 
 	PosNormTexVertex* vertices = NULL;
-	stbds_arrsetlen(vertices, index_count);
+	stbds_arrsetlen(vertices, indexCount);
 
 	u64 vertex_offset = 0;
 	u64 index_offset = 0;
@@ -56,21 +56,21 @@ Mesh meshLoad(const char* path)
 		index_offset += obj->face_vertices[i];
 	}
 
-	assert(vertex_offset == index_count);
+	assert(vertex_offset == indexCount);
 	fast_obj_destroy(obj);
 
 	Mesh m = { 0 };
 	u32* remap = NULL;
-	stbds_arrsetlen(remap, index_count);
-	u64 vertex_count = meshopt_generateVertexRemap(remap, NULL, index_count, vertices, index_count, sizeof(PosNormTexVertex));
+	stbds_arrsetlen(remap, indexCount);
+	u64 vertexCount = meshopt_generateVertexRemap(remap, NULL, indexCount, vertices, indexCount, sizeof(PosNormTexVertex));
 
-	stbds_arrsetlen(m.vertices, vertex_count);
-	m.vertex_count = vertex_count;
-	stbds_arrsetlen(m.indices, index_count);
-	m.index_count = index_count;
+	stbds_arrsetlen(m.vertices, vertexCount);
+	m.vertexCount = vertexCount;
+	stbds_arrsetlen(m.indices, indexCount);
+	m.indexCount = indexCount;
 
-	meshopt_remapVertexBuffer(m.vertices, vertices, index_count, sizeof(PosNormTexVertex), remap);
-	meshopt_remapIndexBuffer(m.indices, NULL, index_count, remap);
+	meshopt_remapVertexBuffer(m.vertices, vertices, indexCount, sizeof(PosNormTexVertex), remap);
+	meshopt_remapIndexBuffer(m.indices, NULL, indexCount, remap);
 	
 	stbds_arrfree(remap);
 	stbds_arrfree(vertices);

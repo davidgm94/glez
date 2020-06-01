@@ -2,7 +2,6 @@
 #include "lightwindows.h"
 #include "file.h"
 #include "tex.h"
-#include "glad.h"
 #include "logger.h"
 
 extern bool g_Running;
@@ -61,10 +60,12 @@ S_OpenGLHandle GL_CreateProgram(S_OpenGLHandle vertex_shader, S_OpenGLHandle fra
     glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
-    if (success) {
+    if (success)
+    {
         logInfo("Shader program linked successfully.\n");
     }
-    else {
+    else
+    {
         char info_log[512];
         glGetProgramInfoLog(shader_program, COUNT_OF(info_log), NULL, info_log);
         logInfo("Shader program failed to be linked:\n%s\n", info_log);

@@ -102,28 +102,28 @@ static unsigned int* hashLookup_u32(unsigned int* table, size_t buckets, VertexH
 	return 0;
 }
 
-size_t meshopt_generateVertexRemap(unsigned int* destination, const unsigned int* indices, size_t index_count, const void* vertices, size_t vertex_count, size_t vertex_size)
+size_t meshopt_generateVertexRemap(unsigned int* destination, const unsigned int* indices, size_t indexCount, const void* vertices, size_t vertexCount, size_t vertexSize)
 {
-	assert(indices || index_count == vertex_count);
-	assert(index_count % 3 == 0);
-	assert(vertex_size > 0 && vertex_size <= 256);
+	assert(indices || indexCount == vertexCount);
+	assert(indexCount % 3 == 0);
+	assert(vertexSize > 0 && vertexSize <= 256);
 
 	MeshoptAllocator allocator = { 0 };
 
-	memset(destination, -1, vertex_count * sizeof(unsigned int));
+	memset(destination, -1, vertexCount * sizeof(unsigned int));
 
-	VertexHasher hasher = { (const unsigned char*)(vertices), vertex_size, vertex_size };
+	VertexHasher hasher = { (const unsigned char*)(vertices), vertexSize, vertexSize };
 
-	size_t table_size = hashBuckets(vertex_count);
+	size_t table_size = hashBuckets(vertexCount);
 	unsigned int* table = meshoptAllocate(&allocator, table_size, sizeof(unsigned int));
 	memset(table, -1, table_size * sizeof(unsigned int));
 
 	unsigned int next_vertex = 0;
 
-	for (size_t i = 0; i < index_count; ++i)
+	for (size_t i = 0; i < indexCount; ++i)
 	{
 		unsigned int index = indices ? indices[i] : (unsigned)(i);
-		assert(index < vertex_count);
+		assert(index < vertexCount);
 
 		if (destination[index] == ~0u)
 		{
@@ -144,7 +144,7 @@ size_t meshopt_generateVertexRemap(unsigned int* destination, const unsigned int
 		}
 	}
 
-	assert(next_vertex <= vertex_count);
+	assert(next_vertex <= vertexCount);
 	meshoptDeallocate(&allocator);
 
 	return next_vertex;
@@ -177,11 +177,11 @@ void meshopt_remapVertexBuffer(void* destination, const void* vertices, size_t v
 	meshoptDeallocate(&allocator);
 }
 
-void meshopt_remapIndexBuffer(unsigned int* destination, const unsigned int* indices, size_t index_count, const unsigned int* remap)
+void meshopt_remapIndexBuffer(unsigned int* destination, const unsigned int* indices, size_t indexCount, const unsigned int* remap)
 {
-	assert(index_count % 3 == 0);
+	assert(indexCount % 3 == 0);
 
-	for (size_t i = 0; i < index_count; ++i)
+	for (size_t i = 0; i < indexCount; ++i)
 	{
 		unsigned int index = indices ? indices[i] : (unsigned)(i);
 		assert(remap[index] != ~0u);

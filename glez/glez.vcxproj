@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\GLEZ\glez.h" />
+    <ClInclude Include="src\allocator.h" />
     <ClInclude Include="src\file.h" />
     <ClInclude Include="src\frame.h" />
     <ClInclude Include="src\entry_point.h" />
@@ -33,6 +35,7 @@
     <ClInclude Include="src\win32_internal.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\allocator.c" />
     <ClCompile Include="src\file.c" />
     <ClCompile Include="src\frame.c" />
     <ClCompile Include="src\meshopt\fast_obj.c" />

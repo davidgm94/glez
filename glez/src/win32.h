@@ -5,6 +5,8 @@ s64 g_performanceFrequency;
 s64 g_startPerformanceCounter;
 
 #include "win32_internal.h"
+#include "openGL/glad.h"
+#include <assert.h>
 
 extern HWND g_WindowHandle;
 extern f32 g_TimeFactor;
@@ -13,12 +15,19 @@ extern bool g_Running;
 
 void platformInitialize(void)
 {
+	QueryPerformanceFrequency((LARGE_INTEGER*)&g_performanceFrequency);
+	const f32 secondsToMilisecondsFactor = 1000.0f;
+	g_TimeFactor = secondsToMilisecondsFactor / (f32)g_performanceFrequency;
+	QueryPerformanceCounter((LARGE_INTEGER*)&g_startPerformanceCounter);
+
 	initLogger(1);
+
 	g_WindowHandle = win32_createWindow(GetModuleHandle(NULL), win32_windowProcedure, 1280, 720, "GLEZ Engine", NULL);
 	
-	QueryPerformanceFrequency((LARGE_INTEGER*)&g_performanceFrequency);
-	g_TimeFactor = 1000.0f / (f32)g_performanceFrequency;
-	QueryPerformanceCounter((LARGE_INTEGER*)&g_startPerformanceCounter);
+	s32 gladInit = gladLoadGL();
+	assert(gladInit);
+	const char* glVersion = glGetString(GL_VERSION);
+	logInfo("OPENGL VERSION: %s\n", glVersion);
 }
 
 APPLICATION_STATUS platformUpdate(void)

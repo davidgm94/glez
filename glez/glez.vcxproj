@@ -26,6 +26,7 @@
     <ClInclude Include="src\logger.h" />
     <ClInclude Include="src\application.h" />
     <ClInclude Include="src\maths.h" />
+    <ClInclude Include="src\page_allocator.h" />
     <ClInclude Include="src\renderer.h" />
     <ClInclude Include="src\stb\stb_ds.h" />
     <ClInclude Include="src\stb\stb_image.h" />
@@ -45,6 +46,7 @@
     <ClCompile Include="src\openGL\gl.c" />
     <ClCompile Include="src\logger.c" />
     <ClCompile Include="src\application.c" />
+    <ClCompile Include="src\page_allocator.c" />
     <ClCompile Include="src\renderer.c" />
     <ClCompile Include="src\stb\stb_ds.c" />
     <ClCompile Include="src\stb\stb_image.c" />

@@ -4,9 +4,9 @@
 
 #define LOGS 1
 #if NDEBUG
-#define GAME_RELEASE
+#define GLEZ_RELEASE 1
 #else
-#define GAME_DEBUG
+#define GLEZ_DEBUG 1
 #endif
 
 #ifdef GLEZ_PLATFORM_WINDOWS

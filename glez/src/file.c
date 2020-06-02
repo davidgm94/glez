@@ -11,7 +11,7 @@ static char file_buffer[MEGABYTES(10)];
 static char* file_buffer_ptr = file_buffer;
 
 char* fileLoad(const char *name) {
-#ifdef GAME_DEBUG
+#ifdef GLEZ_DEBUG
     printf("[FILE] Reading file '%s'...\n", name);
     //printf("[FILE] Reading file '%s'...\n", name);
     char cwd[1024];

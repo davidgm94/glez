@@ -24,6 +24,7 @@
     <ClInclude Include="include\GLEZ\glez.h" />
     <ClInclude Include="src\allocator.h" />
     <ClInclude Include="src\page_allocator.h" />
+    <ClInclude Include="src\buddy_allocator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\application.c" />
@@ -42,6 +43,7 @@
     <ClCompile Include="src\model.c" />
     <ClCompile Include="src\allocator.c" />
     <ClCompile Include="src\page_allocator.c" />
+    <ClCompile Include="src\buddy_allocator.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\triangle_frag.glsl" />

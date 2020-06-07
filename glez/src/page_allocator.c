@@ -4,6 +4,7 @@
 
 #define ALLOCATE_CANARY_PAGE 1
 
+
 size_t pageSize(void);
 size_t getPageSize(void);
 void* allocatePages(size_t size, size_t align);
@@ -16,24 +17,20 @@ size_t allocatedSize(void* p);
 static size_t _total = 0;
 static size_t _pageSize = 0;
 
-size_t roundUpToPageSize(size_t size);
-void* pointerAdd(void* p1, void* p2);
-void* pointerSub(void* p1, void* p2);
-void* roundDownToAlignAdress(void* ptr, u32 align);
 
 Allocator* pageAllocator = NULL;
 
 TRACKED_ALLOCATION_FN(Page_AllocateWithResult)
 {
 	// Critical section
-	size_t virtualMemorySize = roundUpToPageSize(size);
-	void* p = allocatePages(virtualMemorySize, roundUpToPageSize((size_t)align));
+	size_t virtualMemorySize = roundUpToPageSize(size, pageSize());
+	void* p = allocatePages(virtualMemorySize, roundUpToPageSize((size_t)align, pageSize()));
 	assert(p);
 
 #if ALLOCATE_CANARY_PAGE
 	AllocationResult r;
-	r.p = roundDownToAlignAdress(pointerAdd(p, (void*)virtualMemorySize - size), align);
-	r.size = (size_t)pointerSub(pointerAdd(p, (void*)virtualMemorySize), r.p);
+	r.p = roundDownToAlignAdress(pointerAdd(p, virtualMemorySize - size), align);
+	r.size = (size_t)pointerSub(pointerAdd(p, virtualMemorySize), (u32)r.p);
 	_total += r.size;
 	return r;
 #else
@@ -66,7 +63,7 @@ GET_ALLOCATED_SIZE_FN(Page_GetAllocatedSize)
 #if ALLOCATE_CANARY_PAGE
 	void* virtualMemoryPtr = roundDownToAlignAdress(p, pageSize());
 	size_t virtualMemorySize = allocatedSize(virtualMemoryPtr);
-	return (size_t)pointerSub(pointerAdd(virtualMemoryPtr, (void*)virtualMemorySize), p);
+	return (size_t)pointerSub(pointerAdd(virtualMemoryPtr, virtualMemorySize), (u32)p);
 #else
 	return allocatedSize(p);
 #endif
@@ -103,7 +100,7 @@ void* allocatePages(size_t size, size_t align)
 #if ALLOCATE_CANARY_PAGE
 	size_t pageSize = getPageSize();
 	void* p = VirtualAlloc(NULL, size + pageSize, MEM_COMMIT, PAGE_READWRITE);
-	VirtualAlloc(pointerAdd(p, (void*)size), pageSize, MEM_COMMIT, PAGE_NOACCESS);
+	VirtualAlloc(pointerAdd(p, size), pageSize, MEM_COMMIT, PAGE_NOACCESS);
 	return p;
 #else
 	return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_READWRITE);
@@ -116,7 +113,7 @@ void* allocate_DebugMemory(size_t size)
 #if ALLOCATE_CANARY_PAGE
 	size_t pageSize = getPageSize();
 	void* p = VirtualAlloc(NULL, size + pageSize, MEM_COMMIT, PAGE_READWRITE);
-	VirtualAlloc(pointerAdd(p, (void*)size), pageSize, MEM_COMMIT, PAGE_NOACCESS);
+	VirtualAlloc(pointerAdd(p, size), pageSize, MEM_COMMIT, PAGE_NOACCESS);
 	return p;
 #else
 	return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_READWRITE);
@@ -136,3 +133,4 @@ size_t allocatedSize(void* p)
 	VirtualQuery(p, &info, sizeof(info));
 	return info.RegionSize;
 }
+

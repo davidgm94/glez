@@ -64,3 +64,11 @@ typedef struct Allocator
 	IsTempAllocatorFn* isTempAllocator;
 } Allocator;
 void allocate(void);
+
+size_t roundUpToPageSize(size_t size, size_t pageSize);
+
+void* pointerAdd(void* p1, u32 bytes);
+
+void* pointerSub(void* p1, u32 bytes);
+
+void* roundDownToAlignAdress(void* ptr, u32 align);

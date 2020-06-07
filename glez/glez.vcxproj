@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\buddy_allocator.h" />
     <ClInclude Include="include\GLEZ\glez.h" />
     <ClInclude Include="src\allocator.h" />
     <ClInclude Include="src\file.h" />
@@ -36,6 +37,7 @@
     <ClInclude Include="src\win32_internal.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\buddy_allocator.c" />
     <ClCompile Include="src\allocator.c" />
     <ClCompile Include="src\file.c" />
     <ClCompile Include="src\frame.c" />

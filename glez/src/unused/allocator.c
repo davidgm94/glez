@@ -1,6 +1,7 @@
 #include "allocator.h"
 
 #include <math.h>
+#include <assert.h>
 void allocate(void)
 {
 }
@@ -9,11 +10,12 @@ void allocate(void)
 size_t roundUpToPageSize(size_t size, size_t pageSize)
 {
 #if 1
-	size_t value = (size_t)-1;
+	size_t value = 0;
 	for (s32 i = 0; size > value; i++)
 	{
 		value = (size_t)pow(2, i);
 	}
+	assert(value != (size_t)-1);
 	return value;
 #else
 #endif

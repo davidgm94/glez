@@ -1,136 +1,75 @@
 #include "page_allocator.h"
-#include "allocator.h"
+#include "lightwindows.h"
 #include <assert.h>
+#include <stdio.h>
+#include "logger.h"
 
-#define ALLOCATE_CANARY_PAGE 1
-
-
-size_t pageSize(void);
-size_t getPageSize(void);
-void* allocatePages(size_t size, size_t align);
-#if GLEZ_DEBUG
-void* allocate_DebugMemory(size_t size);
-#endif
-void deallocatePages(void* p);
-size_t allocatedSize(void* p);
-
-static size_t _total = 0;
-static size_t _pageSize = 0;
-
-
-Allocator* pageAllocator = NULL;
-
-TRACKED_ALLOCATION_FN(Page_AllocateWithResult)
+static inline size_t getPageSize(void)
 {
-	// Critical section
-	size_t virtualMemorySize = roundUpToPageSize(size, pageSize());
-	void* p = allocatePages(virtualMemorySize, roundUpToPageSize((size_t)align, pageSize()));
+	SYSTEM_INFO systemInfo;
+	GetSystemInfo(&systemInfo);
+	return systemInfo.dwPageSize;
+}
+
+static inline size_t getGranularity(void)
+{
+	SYSTEM_INFO systemInfo;
+	GetSystemInfo(&systemInfo);
+	return systemInfo.dwAllocationGranularity;
+}
+
+AllocationResult reserveVirtualMemory(size_t size, size_t align, bool commit)
+{
+	AllocationResult result = { 0 };
+	assert(size > 0 && align > 0);
+	if (size <= 0 || align <= 0) return result;
+
+	s32 flags = MEM_RESERVE;
+	if (commit) flags |= MEM_COMMIT;
+	void* p = VirtualAlloc(NULL, size, MEM_RESERVE, PAGE_READWRITE);
 	assert(p);
-
-#if ALLOCATE_CANARY_PAGE
-	AllocationResult r;
-	r.p = roundDownToAlignAdress(pointerAdd(p, virtualMemorySize - size), align);
-	r.size = (size_t)pointerSub(pointerAdd(p, virtualMemorySize), (u32)r.p);
-	_total += r.size;
-	return r;
-#else
-	size_t s = allocatedSize(p);
-	_total += s;
-	return pageAllocator->allocateWithResult(p, s);
-#endif
+	if (p)
+	{
+		result.p = p;
+		result.size = size;
+		logInfo("Reserving %u bytes of memory at address 0x%p. [%s]\n", result.size, result.p, commit ? "committing" : "no committing");
+	}
+	return result;
 }
 
-DEALLOCATE_FN(Page_Deallocate)
+void* commitMemory(AllocationResult* allocation)
 {
-	if (p == 0)
-		return 0;
-
-	// Critical section
-	size_t s = allocatedSize(p);
-	_total += s;
-
-#if ALLOCATE_CANARY_PAGE
-	p = roundDownToAlignAdress(p, pageSize());
-#endif
-
-	deallocatePages(p);
-	return s;
+	if (allocation->p)
+	{
+		void* p = VirtualAlloc(allocation->p, allocation->size, MEM_COMMIT, PAGE_READWRITE);
+		assert(p);
+		allocation->p = p;
+		float* fp = p;
+		*fp = 0.0f;
+	}
+	else
+	{
+		allocation->p = NULL;
+		allocation->size = 0;
+	}
+	return allocation->p;
 }
 
-GET_ALLOCATED_SIZE_FN(Page_GetAllocatedSize)
-{
-	// Critical section
-#if ALLOCATE_CANARY_PAGE
-	void* virtualMemoryPtr = roundDownToAlignAdress(p, pageSize());
-	size_t virtualMemorySize = allocatedSize(virtualMemoryPtr);
-	return (size_t)pointerSub(pointerAdd(virtualMemoryPtr, virtualMemorySize), (u32)p);
-#else
-	return allocatedSize(p);
-#endif
-}
 
-#if GLEZ_DEBUG
-void* Page_Allocate_DebugMemory(size_t size)
+void* allocate(size_t size, size_t align)
 {
-	void* p = allocate_DebugMemory(size);
-	assert(p);
+	void* address = NULL;
+	void* p = VirtualAlloc(address, size, MEM_RESERVE, PAGE_READWRITE);
+	if (!p)
+	{
+		DWORD lastError = GetLastError();
+		char buffer[256];
+		FormatMessageA(0, allocate, lastError, NULL, buffer, sizeof(buffer), NULL);
+		OutputDebugStringA("\n");
+		OutputDebugStringA(buffer);
+		OutputDebugStringA("\n");
+		OutputDebugStringA("\n");
+		//assert(p);
+	}
 	return p;
 }
-#endif
-
-#include <lightwindows.h>
-size_t pageSize(void)
-{
-	SYSTEM_INFO si;
-	GetSystemInfo(&si);
-	DWORD granularity = si.dwAllocationGranularity;
-	if (si.dwPageSize > granularity)
-		granularity = si.dwPageSize;
-	return granularity;
-}
-
-size_t getPageSize(void)
-{
-	return _pageSize;
-}
-
-void* allocatePages(size_t size, size_t align)
-{
-	assert(align <= pageSize());
-#if ALLOCATE_CANARY_PAGE
-	size_t pageSize = getPageSize();
-	void* p = VirtualAlloc(NULL, size + pageSize, MEM_COMMIT, PAGE_READWRITE);
-	VirtualAlloc(pointerAdd(p, size), pageSize, MEM_COMMIT, PAGE_NOACCESS);
-	return p;
-#else
-	return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_READWRITE);
-#endif
-}
-
-#if GLEZ_DEBUG
-void* allocate_DebugMemory(size_t size)
-{
-#if ALLOCATE_CANARY_PAGE
-	size_t pageSize = getPageSize();
-	void* p = VirtualAlloc(NULL, size + pageSize, MEM_COMMIT, PAGE_READWRITE);
-	VirtualAlloc(pointerAdd(p, size), pageSize, MEM_COMMIT, PAGE_NOACCESS);
-	return p;
-#else
-	return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_READWRITE);
-#endif
-}
-#endif
-
-void deallocatePages(void* p)
-{
-	s32 result = VirtualFree(p, 0, MEM_RELEASE);
-	assert(result);
-}
-
-size_t allocatedSize(void* p)
-{
-	MEMORY_BASIC_INFORMATION info;
-	VirtualQuery(p, &info, sizeof(info));
-	return info.RegionSize;
-}
-

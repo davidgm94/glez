@@ -46,7 +46,8 @@ void initLogger(LOG_LEVEL logLevel)
 	i_loggerConfig.level = logLevel;
 }
 
-void logger(const char* logContext, u32 charCount, LOG_LEVEL level, const char* file, s32 line, const char* fmt, ...)
+#include <stdlib.h>
+void logger(const char* logContext, u32 charCount, LOG_LEVEL level, const char* file, s32 fileCharCount, s32 line, const char* fmt, ...)
 {
 	if (!level || level < i_loggerConfig.level)
 		return;
@@ -55,13 +56,15 @@ void logger(const char* logContext, u32 charCount, LOG_LEVEL level, const char* 
 	
 	strcpy(i_printBufferPtr, logContext);
 	i_printBufferPtr += charCount;
-
-	u64 len = dontFormat(fmt);
-	if (len) {
-		strcpy(i_printBufferPtr, fmt);
-		i_printBufferPtr += len;
-		return;
-	}
+	*i_printBufferPtr++ = '[';
+	strcpy(i_printBufferPtr, file);
+	i_printBufferPtr += fileCharCount - 1;
+	char lineBuffer[16];
+	strcpy(i_printBufferPtr, itoa(line, lineBuffer, 10));
+	*i_printBufferPtr = ':';
+	i_printBufferPtr += strlen(lineBuffer);
+	*i_printBufferPtr++ = ']';
+	*i_printBufferPtr++ = '\t';
 
 	va_list args;
 	va_start(args, fmt);

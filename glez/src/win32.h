@@ -7,6 +7,7 @@ s64 g_startPerformanceCounter;
 #include "win32_internal.h"
 #include "openGL/glad.h"
 #include <assert.h>
+#include "page_allocator.h"
 
 extern HWND g_WindowHandle;
 extern f32 g_TimeFactor;
@@ -21,13 +22,21 @@ void platformInitialize(void)
 	QueryPerformanceCounter((LARGE_INTEGER*)&g_startPerformanceCounter);
 
 	initLogger(1);
+	AllocationResult r = reserveVirtualMemory(1, 1, false);
+	commitMemory(&r);
+
 
 	g_WindowHandle = win32_createWindow(GetModuleHandle(NULL), win32_windowProcedure, 1280, 720, "GLEZ Engine", NULL);
 	
 	s32 gladInit = gladLoadGL();
 	assert(gladInit);
-	const char* glVersion = glGetString(GL_VERSION);
+	const unsigned char* glVersion = glGetString(GL_VERSION);
 	logInfo("OPENGL VERSION: %s\n", glVersion);
+#define TESTING 1
+#if TESTING
+	consumePrintBuffer(LOG_STDOUT);
+	ExitProcess(0);
+#endif
 }
 
 APPLICATION_STATUS platformUpdate(void)

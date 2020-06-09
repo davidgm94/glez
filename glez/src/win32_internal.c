@@ -94,6 +94,7 @@ void win32_deleteGLContext(HDC dc, HGLRC context)
 void initWMStrings(void)
 {
 	i_SwitchRegister = fopen("switch_register.log", "w");
+	memset(i_WM_Strings, 0, sizeof(i_WM_Strings));
 	FILL_ARR(WM_WINDOWPOSCHANGING);
 	FILL_ARR(WM_MOUSEMOVE);
 	FILL_ARR(WM_NULL);
@@ -610,7 +611,7 @@ LRESULT win32_windowProcedure(HWND window, UINT message, WPARAM wParam, LPARAM l
 
 		default:
 		{
-			logInfo("%u : %s\n", message, i_WM_Strings[message]);
+			logInfo("Undealt window message: %u %s\n", message, i_WM_Strings[message]);
 			//fprintf(i_SwitchRegister, "case (%s):\n{\n\t\n}\n", i_WM_Strings[message]);
 		} break;
 	}

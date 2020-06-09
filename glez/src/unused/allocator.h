@@ -1,10 +1,11 @@
+#pragma once
 #include "type.h"
 #include <string.h>
 
 #define alignof(x) __alignof(x)
 #define INLINE __forceinline
 
-typedef struct
+typedef struct AllocationResult
 {
 	void* p;
 	size_t size;
@@ -66,9 +67,6 @@ typedef struct Allocator
 void allocate(void);
 
 size_t roundUpToPageSize(size_t size, size_t pageSize);
-
 void* pointerAdd(void* p1, u32 bytes);
-
 void* pointerSub(void* p1, u32 bytes);
-
 void* roundDownToAlignAdress(void* ptr, u32 align);

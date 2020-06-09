@@ -11,9 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\buddy_allocator.h" />
+    <ClInclude Include="src\page_allocator.h" />
     <ClInclude Include="include\GLEZ\glez.h" />
-    <ClInclude Include="src\allocator.h" />
     <ClInclude Include="src\file.h" />
     <ClInclude Include="src\frame.h" />
     <ClInclude Include="src\entry_point.h" />
@@ -27,7 +26,6 @@
     <ClInclude Include="src\logger.h" />
     <ClInclude Include="src\application.h" />
     <ClInclude Include="src\maths.h" />
-    <ClInclude Include="src\page_allocator.h" />
     <ClInclude Include="src\renderer.h" />
     <ClInclude Include="src\stb\stb_ds.h" />
     <ClInclude Include="src\stb\stb_image.h" />
@@ -37,8 +35,7 @@
     <ClInclude Include="src\win32_internal.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\buddy_allocator.c" />
-    <ClCompile Include="src\allocator.c" />
+    <ClCompile Include="src\page_allocator.c" />
     <ClCompile Include="src\file.c" />
     <ClCompile Include="src\frame.c" />
     <ClCompile Include="src\meshopt\fast_obj.c" />
@@ -48,7 +45,6 @@
     <ClCompile Include="src\openGL\gl.c" />
     <ClCompile Include="src\logger.c" />
     <ClCompile Include="src\application.c" />
-    <ClCompile Include="src\page_allocator.c" />
     <ClCompile Include="src\renderer.c" />
     <ClCompile Include="src\stb\stb_ds.c" />
     <ClCompile Include="src\stb\stb_image.c" />

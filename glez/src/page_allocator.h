@@ -3,12 +3,13 @@
 
 typedef struct AllocationResult
 {
-	void* p;
+	void* memory;
 	size_t size;
 } AllocationResult;
 
-AllocationResult reserveVirtualMemory(size_t size, size_t align, bool commit);
+void memory_InitializePageAllocator(void);
 
-void* commitMemory(AllocationResult* allocation);
+AllocationResult allocateVirtualMemory(size_t size, size_t align);
 
-void* allocate(size_t size, size_t align);
+void freeAllVirtualMemory(void);
+

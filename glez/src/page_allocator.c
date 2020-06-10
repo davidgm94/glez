@@ -4,72 +4,95 @@
 #include <stdio.h>
 #include "logger.h"
 
-static inline size_t getPageSize(void)
+#define MAX_ALLOCS KILOBYTES(100)
+
+typedef struct FreeNode
+{
+	void* allocatedMemory;
+	size_t allocatedSize;
+} FreeNode;
+typedef struct FreeList
+{
+	FreeNode nodeList[MAX_ALLOCS];
+	u64 allocationCount;
+} FreeList;
+
+FreeList i_FreeList = { 0 };
+
+u32 i_PageSize = { 0 };
+
+void memory_InitializePageAllocator(void)
 {
 	SYSTEM_INFO systemInfo;
 	GetSystemInfo(&systemInfo);
-	return systemInfo.dwPageSize;
+	u32 pageSize = systemInfo.dwPageSize;
+	u32 granularity = systemInfo.dwAllocationGranularity;
+	u32 resultingPageSize = pageSize > granularity ? pageSize : granularity;
+	logInfo("[PAGE ALLOCATOR INITIALIZED] PAGE SIZE: %u bytes. GRANULARITY: %u bytes. RESULTING PAGE SIZE: %u bytes.\n", pageSize, granularity, resultingPageSize);
+	i_PageSize = resultingPageSize;
 }
 
-static inline size_t getGranularity(void)
+static inline void* alignAddress(void* address, size_t align)
 {
-	SYSTEM_INFO systemInfo;
-	GetSystemInfo(&systemInfo);
-	return systemInfo.dwAllocationGranularity;
+	const size_t mask = align - 1;
+	uintptr_t p = (uintptr_t)address;
+	assert((align & mask) == 0);
+
+	return (void*)((p + mask) & ~mask);
 }
 
-AllocationResult reserveVirtualMemory(size_t size, size_t align, bool commit)
+static inline size_t roundUpToNextPage(size_t size)
+{
+	size_t remainder = (size % i_PageSize);
+	size_t toAdd = i_PageSize - remainder;
+	return size + toAdd;
+}
+
+AllocationResult allocateVirtualMemory(size_t size, size_t align)
 {
 	AllocationResult result = { 0 };
 	assert(size > 0 && align > 0);
 	if (size <= 0 || align <= 0) return result;
 
-	s32 flags = MEM_RESERVE;
-	if (commit) flags |= MEM_COMMIT;
-	void* p = VirtualAlloc(NULL, size, MEM_RESERVE, PAGE_READWRITE);
+	size = roundUpToNextPage(size);
+
+	s32 flags = MEM_RESERVE | MEM_COMMIT;
+	void* p = VirtualAlloc(NULL, size, flags, PAGE_READWRITE);
 	assert(p);
 	if (p)
 	{
-		result.p = p;
-		result.size = size;
-		logInfo("Reserving %u bytes of memory at address 0x%p. [%s]\n", result.size, result.p, commit ? "committing" : "no committing");
+		i_FreeList.nodeList[i_FreeList.allocationCount].allocatedMemory = p;
+		i_FreeList.nodeList[i_FreeList.allocationCount].allocatedSize = size;
+		++i_FreeList.allocationCount;
+		logInfo("Reserving %u bytes of memory at address 0x%p\n", size, p);
+		result.memory = alignAddress(p, align);
+		const size_t lostMemory = ((uintptr_t)(result.memory) - (uintptr_t)p);
+		result.size = size - lostMemory;
+		logInfo("%u-byte aligned pointer: 0x%p. Lost memory: %zu\n", align, result.memory, lostMemory);
+	}
+	else
+	{
+		logError("Allocation failed!\n");
 	}
 	return result;
 }
 
-void* commitMemory(AllocationResult* allocation)
+// TODO: fix this. Not working
+void freeAllVirtualMemory(void)
 {
-	if (allocation->p)
-	{
-		void* p = VirtualAlloc(allocation->p, allocation->size, MEM_COMMIT, PAGE_READWRITE);
-		assert(p);
-		allocation->p = p;
-		float* fp = p;
-		*fp = 0.0f;
-	}
-	else
-	{
-		allocation->p = NULL;
-		allocation->size = 0;
-	}
-	return allocation->p;
-}
+	u64 allocationCount = i_FreeList.allocationCount;
+	FreeNode* freeNodeList = i_FreeList.nodeList;
 
-
-void* allocate(size_t size, size_t align)
-{
-	void* address = NULL;
-	void* p = VirtualAlloc(address, size, MEM_RESERVE, PAGE_READWRITE);
-	if (!p)
+	for (u64 i = 0; i < allocationCount; i++)
 	{
-		DWORD lastError = GetLastError();
-		char buffer[256];
-		FormatMessageA(0, allocate, lastError, NULL, buffer, sizeof(buffer), NULL);
-		OutputDebugStringA("\n");
-		OutputDebugStringA(buffer);
-		OutputDebugStringA("\n");
-		OutputDebugStringA("\n");
-		//assert(p);
+		FreeNode* node = &freeNodeList[i];
+		BOOL result = VirtualFree(node->allocatedMemory, node->allocatedSize, 0);
+		if (!result)
+		{
+			DWORD virtualFreeError = GetLastError();
+			char errorBuffer[256];
+			FormatMessageA(0, 0, virtualFreeError, 0, errorBuffer, sizeof(errorBuffer), 0);
+			logError("VirtualFree failed: %s.\n", errorBuffer);
+		}
 	}
-	return p;
 }

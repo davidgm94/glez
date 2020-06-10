@@ -8,6 +8,7 @@ s64 g_startPerformanceCounter;
 #include "openGL/glad.h"
 #include <assert.h>
 #include "page_allocator.h"
+#include <stdlib.h>
 
 extern HWND g_WindowHandle;
 extern f32 g_TimeFactor;
@@ -21,9 +22,14 @@ void platformInitialize(void)
 	g_TimeFactor = secondsToMilisecondsFactor / (f32)g_performanceFrequency;
 	QueryPerformanceCounter((LARGE_INTEGER*)&g_startPerformanceCounter);
 
-	initLogger(1);
-	AllocationResult r = reserveVirtualMemory(1, 1, false);
-	commitMemory(&r);
+	initLogger(LOG_LEVEL_DEBUG);
+	memory_InitializePageAllocator();
+	AllocationResult r = allocateVirtualMemory(1, 1);
+	volatile float* arr = r.memory;
+	for (int i = 0; i < 10; i++)
+	{
+		size_t r = rand();
+	}
 
 
 	g_WindowHandle = win32_createWindow(GetModuleHandle(NULL), win32_windowProcedure, 1280, 720, "GLEZ Engine", NULL);
@@ -34,6 +40,7 @@ void platformInitialize(void)
 	logInfo("OPENGL VERSION: %s\n", glVersion);
 #define TESTING 1
 #if TESTING
+	freeAllVirtualMemory();
 	consumePrintBuffer(LOG_STDOUT);
 	ExitProcess(0);
 #endif

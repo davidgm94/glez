@@ -18,19 +18,6 @@ static struct
 
 static char* i_printBufferPtr = i_loggerConfig.printBuffer;
 
-static inline u64 dontFormat(const char* str)
-{
-	u64 len = strlen(str);
-	for (u64 i = 0; i < len; i++)
-	{
-		char c = str[i];
-		if (c == '%')
-			return 0;
-	}
-
-	return len;
-}
-
 char** getPointerToPrintBuffer(void)
 {
 	return &i_printBufferPtr;
@@ -60,7 +47,7 @@ void logger(const char* logContext, u32 charCount, LOG_LEVEL level, const char* 
 	strcpy(i_printBufferPtr, file);
 	i_printBufferPtr += fileCharCount - 1;
 	char lineBuffer[16];
-	strcpy(i_printBufferPtr, itoa(line, lineBuffer, 10));
+	strcpy(i_printBufferPtr, _itoa(line, lineBuffer, 10));
 	*i_printBufferPtr = ':';
 	i_printBufferPtr += strlen(lineBuffer);
 	*i_printBufferPtr++ = ']';

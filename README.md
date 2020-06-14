@@ -1,6 +1,8 @@
 # GLEZ
 
-Experimental engine
+Experimental engine (currenctly only available in Windows).
+
+The IDE used for development was Visual Studio 2019.
 
 
 **TODO LIST**

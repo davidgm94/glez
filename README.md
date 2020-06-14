@@ -1,9 +1,9 @@
 # GLEZ
 
-An OpenGL-based renderer
+Experimental engine
 
 
 **TODO LIST**
 
 
-- [ ] Fix glslang compilation in the Vulkan backend
+- [ ] Get engine back to previous GL functional state.

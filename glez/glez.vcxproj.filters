@@ -23,6 +23,11 @@
     <ClInclude Include="src\model.h" />
     <ClInclude Include="include\GLEZ\glez.h" />
     <ClInclude Include="src\page_allocator.h" />
+    <ClInclude Include="src\generic_allocator.h" />
+    <ClInclude Include="src\string_tools.h" />
+    <ClInclude Include="src\linear_allocator.h" />
+    <ClInclude Include="src\stack_allocator.h" />
+    <ClInclude Include="src\iallocator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\application.c" />
@@ -40,6 +45,10 @@
     <ClCompile Include="src\meshopt\meshoptimizer.c" />
     <ClCompile Include="src\model.c" />
     <ClCompile Include="src\page_allocator.c" />
+    <ClCompile Include="src\generic_allocator.c" />
+    <ClCompile Include="src\string_tools.c" />
+    <ClCompile Include="src\linear_allocator.c" />
+    <ClCompile Include="src\stack_allocator.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\triangle_frag.glsl" />

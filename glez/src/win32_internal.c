@@ -524,6 +524,9 @@ LRESULT win32_windowProcedure(HWND window, UINT message, WPARAM wParam, LPARAM l
 		{
 
 		} break;
+		// TODO: rewrite for raw input-based keyboard input
+		// https://blog.molecular-matters.com/2011/09/05/properly-handling-keyboard-input/
+		// https://docs.microsoft.com/es-es/windows/win32/inputdev/about-raw-input?redirectedfrom=MSDN
 		case (WM_KEYDOWN):
 		{
 

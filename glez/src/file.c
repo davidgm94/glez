@@ -5,7 +5,18 @@
 #include <Windows.h>
 #elif __linux__
 #include <unistd.h>
+#include "file.h"
 #endif
+
+typedef struct OsFile
+{
+    void* handle;
+} OsFile;
+
+typedef struct OsAsyncFileOperation
+{
+    void* handle;
+} OsAsyncFileOperation;
 
 static char file_buffer[MEGABYTES(10)];
 static char* file_buffer_ptr = file_buffer;
@@ -39,4 +50,41 @@ char* fileLoad(const char *name) {
     char* file_content = file_buffer_ptr;
     file_buffer_ptr += length;
     return file_content;
+}
+
+size_t File_Read(OsFile* file, void* buffer, size_t length)
+{
+    return 0;
+}
+
+size_t File_Write(OsFile* file, const void* buffer, size_t length)
+{
+    return 0;
+}
+
+void File_Seek(OsFile* file, size_t position)
+{
+}
+
+void File_SeekToEnd(OsFile* file)
+{
+}
+
+void File_Skip(OsFile* file, size_t bytes)
+{
+}
+
+size_t File_Tell(const OsFile* file)
+{
+    return 0;
+}
+
+OsAsyncFileOperation File_ReadAsync(OsFile* file, void* buffer, size_t length)
+{
+    return (OsAsyncFileOperation){ 0 };
+}
+
+OsAsyncFileOperation File_WriteAsync(OsFile* file, void* buffer, size_t length)
+{
+    return (OsAsyncFileOperation){ 0 };
 }

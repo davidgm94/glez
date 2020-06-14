@@ -4,6 +4,7 @@
 
 #define alignof(x) __alignof(x)
 #define INLINE __forceinline
+extern double pow(double x, double y);
 
 typedef struct AllocationResult
 {
@@ -11,28 +12,18 @@ typedef struct AllocationResult
 	size_t size;
 } AllocationResult;
 
-INLINE AllocationResult returnAllocationResult(void* p, size_t size)
-{
-	AllocationResult r = { .p = p, .size = size };
-#ifdef GLEZ_DEBUG
-	// TODO ???
-	memset(r.p, 0x66, r.size);
-#endif
-	return r;
-}
-
 static const s32 DEFAULT_ALIGN = 4;
 
-struct Allocator;
+typedef struct IAllocator IAllocator;
 #define TYPEDEF_FN(fn)
 
-#define TRACKED_ALLOCATION_FN(fn) AllocationResult fn(size_t size, u32 align)
-#define ALLOCATION_WITH_ALIGN_FN(fn) void* fn(size_t size, u32 align)
+#define TRACKED_ALLOCATION_FN(fn) AllocationResult fn(IAllocator* allocator, size_t size, size_t align)
+#define ALLOCATION_WITH_ALIGN_FN(fn) void* fn(size_t size, size_t align)
 #define ALLOCATION_FN(fn) void* fn(size_t size)
 #define DEALLOCATE_FN(fn) size_t fn(void* p)
 #define GET_ALLOCATED_SIZE_FN(fn) size_t fn(void* p)
 #define TOTAL_ALLOCATED_SIZE_FN(fn) size_t fn(void)
-#define GET_BACKING_ALLOCATORS_FN(fn) void fn(struct Allocator* allocators)
+#define GET_BACKING_ALLOCATORS_FN(fn) void fn(IAllocator* allocators)
 #define IS_TEMP_ALLOCATOR_FN(fn) void fn(void)
 
 typedef TRACKED_ALLOCATION_FN(TrackedAllocationFn);
@@ -53,7 +44,7 @@ typedef IS_TEMP_ALLOCATOR_FN(IsTempAllocatorFn);
 	* Trace allocator -> CaptureStackBackTrace
 */
 
-typedef struct Allocator
+typedef struct IAllocator
 {
 	TrackedAllocationFn* allocateWithResult;
 	AllocationWithAlignFn* allocateNoAlign;
@@ -63,10 +54,48 @@ typedef struct Allocator
 	TotalAllocatedSizeFn* getTotalAllocatedSize;
 	GetBackingAllocatorsFn* getBackingAllocators;
 	IsTempAllocatorFn* isTempAllocator;
-} Allocator;
-void allocate(void);
+} IAllocator;
 
-size_t roundUpToPageSize(size_t size, size_t pageSize);
-void* pointerAdd(void* p1, u32 bytes);
-void* pointerSub(void* p1, u32 bytes);
-void* roundDownToAlignAdress(void* ptr, u32 align);
+// TODO: Optimize algorithm
+inline size_t roundUpToPageSize(size_t size, size_t pageSize)
+{
+#if 1
+	size_t value = 0;
+	for (s32 i = 0; size > value; i++)
+	{
+		value = (size_t)pow(2, i);
+	}
+	// assert(value != (size_t)-1);
+	return value;
+#else
+#endif
+}
+
+inline void* pointerAdd(void* p, u32 increment)
+{
+	return (void*)((char*)p + increment);
+}
+
+inline void* pointerSub(void* p, u32 increment)
+{
+	return (void*)((char*)p - increment);
+}
+
+inline void* roundDownToAlignAdress(void* p, u32 align)
+{
+	uintptr_t pi = (uintptr_t)p;
+	const u32 mod = pi % align;
+	if (mod)
+		pi += (align - mod);
+	return (void*)pi;
+}
+//INLINE AllocationResult returnAllocationResult(void* p, size_t size)
+//{
+//	AllocationResult r = { .p = p, .size = size };
+//#ifdef GLEZ_DEBUG
+//	// TODO ???
+//	memset(r.p, 0x66, r.size);
+//#endif
+//	return r;
+//}
+//

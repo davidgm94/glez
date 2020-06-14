@@ -11,6 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\iallocator.h" />
+    <ClInclude Include="src\linear_allocator.h" />
+    <ClInclude Include="src\generic_allocator.h" />
     <ClInclude Include="src\page_allocator.h" />
     <ClInclude Include="include\GLEZ\glez.h" />
     <ClInclude Include="src\file.h" />
@@ -27,14 +30,18 @@
     <ClInclude Include="src\application.h" />
     <ClInclude Include="src\maths.h" />
     <ClInclude Include="src\renderer.h" />
+    <ClInclude Include="src\stack_allocator.h" />
     <ClInclude Include="src\stb\stb_ds.h" />
     <ClInclude Include="src\stb\stb_image.h" />
+    <ClInclude Include="src\string_tools.h" />
     <ClInclude Include="src\tex.h" />
     <ClInclude Include="src\type.h" />
     <ClInclude Include="src\win32.h" />
     <ClInclude Include="src\win32_internal.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\linear_allocator.c" />
+    <ClCompile Include="src\generic_allocator.c" />
     <ClCompile Include="src\page_allocator.c" />
     <ClCompile Include="src\file.c" />
     <ClCompile Include="src\frame.c" />
@@ -46,8 +53,10 @@
     <ClCompile Include="src\logger.c" />
     <ClCompile Include="src\application.c" />
     <ClCompile Include="src\renderer.c" />
+    <ClCompile Include="src\stack_allocator.c" />
     <ClCompile Include="src\stb\stb_ds.c" />
     <ClCompile Include="src\stb\stb_image.c" />
+    <ClCompile Include="src\string_tools.c" />
     <ClCompile Include="src\tex.c" />
     <ClCompile Include="src\win32_internal.c" />
   </ItemGroup>

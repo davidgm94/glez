@@ -3,6 +3,7 @@
 #include "lightwindows.h"
 #include "openGL/gl.h"
 #include "model.h"
+#include "openGL/glad.h"
 
 GLEZ_API void GLEZ_clearColor(f32 r, f32 g, f32 b, f32 a)
 {
@@ -18,6 +19,7 @@ void GLEZ_loadTriangle(void)
 
 	SimpleMesh triangleMesh = {0};
 }
+
 GLEZ_API void GLEZ_renderTriangle(void)
 {
 	return;

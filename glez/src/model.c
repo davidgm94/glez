@@ -5,7 +5,7 @@
 #include <meshopt/meshoptimizer.h>
 #include <assert.h>
 
-Mesh meshLoad(const char* path)
+Mesh Mesh_Load(const char* path)
 {
 	fastObjMesh* obj = fast_obj_read(path);
 	assert(obj);

@@ -3,6 +3,7 @@
 #include "file.h"
 #include "tex.h"
 #include "logger.h"
+#include "glad.h"
 
 extern bool g_Running;
 

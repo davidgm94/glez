@@ -28,6 +28,8 @@
     <ClInclude Include="src\linear_allocator.h" />
     <ClInclude Include="src\stack_allocator.h" />
     <ClInclude Include="src\iallocator.h" />
+    <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\entity.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\application.c" />
@@ -49,6 +51,8 @@
     <ClCompile Include="src\string_tools.c" />
     <ClCompile Include="src\linear_allocator.c" />
     <ClCompile Include="src\stack_allocator.c" />
+    <ClCompile Include="src\camera.c" />
+    <ClCompile Include="src\entity.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\triangle_frag.glsl" />

@@ -25,4 +25,4 @@ typedef struct
 	u32 vertexCount, indexCount;
 } Mesh;
 
-Mesh meshLoad(const char* path);
+Mesh Mesh_Load(const char* path);

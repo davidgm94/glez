@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\entity.h" />
     <ClInclude Include="src\iallocator.h" />
     <ClInclude Include="src\linear_allocator.h" />
     <ClInclude Include="src\generic_allocator.h" />
@@ -40,6 +42,8 @@
     <ClInclude Include="src\win32_internal.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\camera.c" />
+    <ClCompile Include="src\entity.c" />
     <ClCompile Include="src\linear_allocator.c" />
     <ClCompile Include="src\generic_allocator.c" />
     <ClCompile Include="src\page_allocator.c" />

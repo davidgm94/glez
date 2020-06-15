@@ -1,8 +1,9 @@
 #pragma once
 #include "type.h"
-#include "glad.h"
-typedef int S_OpenGLHandle;
-typedef unsigned U_OpenGLHandle;
+
+typedef s32 S_OpenGLHandle;
+typedef u32 U_OpenGLHandle;
+typedef struct TextureInfo TextureInfo;
 
 typedef struct{
     u32 type;
@@ -10,9 +11,8 @@ typedef struct{
     u32 size;
 } UniformMetadata;
 
-struct TextureInfo;
 
-U_OpenGLHandle GL_GenerateTexture(struct TextureInfo tex, bool transparency);
+U_OpenGLHandle GL_GenerateTexture(TextureInfo tex, bool transparency);
 
 S_OpenGLHandle GL_CompileShader(const char* filename, u32 shader_type);
 S_OpenGLHandle GL_CreateProgram(S_OpenGLHandle vertex_shader, S_OpenGLHandle fragment_shader);
